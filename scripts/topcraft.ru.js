@@ -41,7 +41,6 @@ async function vote(first) {
     const project = await getProject()
 
     document.querySelector('input[name=nick]').value = project.nick
-    // document.querySelector('input[name=nick]').click()
     window.portIsTrusted.dataset.ITtype = 'click'
     document.querySelector('.voteBtn').click()
     window.portIsTrusted.dataset.ITtype = null
