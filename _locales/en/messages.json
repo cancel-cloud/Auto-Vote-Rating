@@ -1105,5 +1105,13 @@
   },
   "notReadyInject": {
     "message": "It looks like the tab started loading when the extension was not ready for it, this may lead to errors in voting"
+  },
+  "siteError": {
+    "message": "The site has returned an error: $error$",
+    "placeholders": {
+      "error": {
+        "content": "$1"
+      }
+    }
   }
 }

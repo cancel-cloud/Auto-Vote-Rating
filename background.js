@@ -1428,7 +1428,7 @@ async function endVote(request, sender, project) {
                 message += ' ' + chrome.i18n.getMessage('usedTranslator')
             }
         } else {
-            message = request.message
+            message = chrome.i18n.getMessage('siteError', request.message)
         }
         if (message.length === 0) message = chrome.i18n.getMessage('emptyError')
         if (request.incorrectDomain) {
