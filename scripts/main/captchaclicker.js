@@ -148,20 +148,21 @@ function run() {
             }
         }, 1000)
     } else if (window.location.href.match(/https:\/\/challenges.cloudflare.com\/*/)) {
+        const body = chrome.dom.openOrClosedShadowRoot(document.body)
         //Если требуется ручное прохождение капчи CloudFlare
         const timer7 = setInterval(()=> {
-            if (document.querySelector('#cf-norobot-container')) {
+            if (body.querySelector('#cf-norobot-container')) {
                 clearInterval(timer7)
-                document.querySelector('#cf-norobot-container span.mark').click()
-            } else if (document.querySelector('#challenge-stage span.mark')) {
+                body.querySelector('#cf-norobot-container span.mark').click()
+            } else if (body.querySelector('#challenge-stage span.mark')) {
                 clearInterval(timer7)
-                document.querySelector('#challenge-stage span.mark').click()
+                body.querySelector('#challenge-stage span.mark').click()
             }
         }, 1000)
 
         // Если мы прошли капчу CloudFlare
         const timer8 = setInterval(() => {
-            if (document.querySelector('#success') && document.querySelector('#success').style.display !== 'none') {
+            if (body.querySelector('#success') && body.querySelector('#success').style.display !== 'none') {
                 clearInterval(timer8)
                 window.solvedCaptcha = true
                 chrome.runtime.sendMessage({captchaPassed: true})
