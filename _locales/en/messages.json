@@ -1113,5 +1113,16 @@
         "content": "$1"
       }
     }
+  },
+  "disabledSite": {
+    "message": "Temporarily disabled by the extension. Reason: $reason$",
+    "placeholders": {
+      "reason": {
+        "content": "$1"
+      }
+    }
+  },
+  "never": {
+    "message": "Never"
   }
 }

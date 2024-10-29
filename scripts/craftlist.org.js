@@ -1,4 +1,12 @@
 async function vote(first) {
+    // TODO ban
+    const request = {}
+    request.disabledSite = 'There is a high risk of being blocked for auto-voting, vote on this site manually'
+    request.ignoreReport = true
+    request.retryCoolDown = 315576000000
+    chrome.runtime.sendMessage(request)
+    return
+
     if (first) await wait(Math.floor(Math.random() * 3000 + 1000))
 
     if (document.querySelector('div.alert.alert-success')) {

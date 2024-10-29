@@ -1079,5 +1079,16 @@
         "content": "$1"
       }
     }
+  },
+  "disabledSite": {
+    "message": "Временно отключено расширением. Причина: $reason$",
+    "placeholders": {
+      "reason": {
+        "content": "$1"
+      }
+    }
+  },
+  "never": {
+    "message": "Никогда"
   }
 }
