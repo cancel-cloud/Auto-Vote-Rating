@@ -13,6 +13,8 @@
                 if (!args?.[1]) return Reflect.apply(...arguments)
                 args[1] = new Proxy(args[1], {
                     apply(target, thisArg, args) {
+                        if (ITLastEvent && !port.dataset.ITtype) ITLastEvent = null
+
                         const detail = args?.[0]?.detail
                         // извращённый, но безопасный метод
                         if (detail?.avrId && port.dataset?.avrId && detail.avrId === port.dataset.avrId) {
@@ -21,11 +23,9 @@
                                 get(target, prop, receiver) {
                                     const value = target[prop]
                                     if (value instanceof Function) {
-                                        return function (...args) {
-                                            return value.apply(this === receiver ? target : this, args)
-                                        }
+                                        return target[prop].bind(target)
                                     }
-                                    if (prop === 'avrId') {
+                                    if (prop === 'avrId' || prop === 'detail') {
                                         return null
                                     }
                                     if (detail[prop] != null) {
@@ -34,10 +34,9 @@
                                         }
                                         return detail[prop]
                                     }
-                                    if (args[0][prop] != null) {
-                                        return args[0][prop]
-                                    }
-                                    return Reflect.get(...arguments)
+                                    // TODO ошибка Illegal invocation, хз почему
+                                    // return Reflect.get(...arguments)
+                                    return value
                                 },
                             })
                         // более простой, но менее безопасный метод
@@ -51,14 +50,14 @@
                                 get(target, prop, receiver) {
                                     const value = target[prop]
                                     if (value instanceof Function) {
-                                        return function (...args) {
-                                            return value.apply(this === receiver ? target : this, args)
-                                        }
+                                        return target[prop].bind(target)
                                     }
                                     if (prop === 'isTrusted') {
                                         return true
                                     }
-                                    return Reflect.get(...arguments)
+                                    // TODO ошибка Illegal invocation, хз почему
+                                    // return Reflect.get(...arguments)
+                                    return value
                                 },
                             })
                         }
