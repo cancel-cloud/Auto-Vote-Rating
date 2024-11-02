@@ -9,7 +9,6 @@ importScripts('main.js')
 // TODO отложенный importScripts пока не работают, подробнее https://bugs.chromium.org/p/chromium/issues/detail?id=1198822
 self.addEventListener('install', () => {
     importScripts('libs/linkedom.js')
-    importScripts('libs/evalCore.umd.js')
     importScripts('scripts/mcserver-list.eu_silentvote.js', 'scripts/misterlauncher.org_silentvote.js', 'scripts/serverpact.com_silentvote.js', 'scripts/genshindrop.com_silentvote.js')
 })
 
@@ -24,9 +23,6 @@ let notSupportedGroupTabs = false
 //Нужно ли сейчас делать проверку голосования, false может быть только лишь тогда когда предыдущая проверка ещё не завершилась
 let check = true
 let doubleCheck = false
-
-let evil
-let evilProjects
 
 let silentResponseBody = {}
 
@@ -163,32 +159,8 @@ async function checkOpen(project, transaction) {
                 console.warn(getProjectPrefix(projectTimeout, true), chrome.i18n.getMessage('timeout'))
                 sendNotification(getProjectPrefix(projectTimeout, false), chrome.i18n.getMessage('timeout'), 'warn', 'openProject_' + project.key)
 
-                // noinspection PointlessBooleanExpressionJS
-                if (false && /*settings.enabledReportTimeout*/ value.rating === 'mmotop.ru' && Number.isInteger(tab) && !settings.disabledSendErrorSentry && value.nextAttempt && value.countInject) {
-                    (async() => {
-                        try {
-                            // noinspection JSCheckFunctionSignatures
-                            const details = await chrome.tabs.get(tab)
-                            if (details.url) {
-                                const domain = getDomainWithoutSubdomain(details.url)
-                                // Если мы попали не по адресу, ну значит не надо отсылать отчёт об ошибке
-                                if (domain !== value.rating) {
-                                    return
-                                }
-                            }
-                            await reportError({timeout: true}, {tab: {id: details.id}, url: details.url}, projectTimeout)
-                        } catch (error) {
-                            if (!error.message.includes('No tab with id')) {
-                                console.warn(getProjectPrefix(projectTimeout, true), error.message)
-                            }
-                        } finally {
-                            if (!settings.disableCloseTabsOnError) tryCloseTab(tab, projectTimeout, 0)
-                        }
-                    })()
-                } else {
-                    // noinspection JSIgnoredPromiseFromCall
-                    if (!settings.disableCloseTabsOnError) tryCloseTab(tab, projectTimeout, 0)
-                }
+                // noinspection JSIgnoredPromiseFromCall
+                if (!settings.disableCloseTabsOnError) tryCloseTab(tab, projectTimeout, 0)
                 break
             }
         }
@@ -237,28 +209,6 @@ async function checkOpen(project, transaction) {
             for (let i = 0; i < cookies.length; i++) {
                 if (cookies[i].domain.charAt(0) === '.') cookies[i].domain = cookies[i].domain.substring(1, cookies[i].domain.length)
                 await chrome.cookies.remove({url: 'https://' + cookies[i].domain + cookies[i].path, name: cookies[i].name})
-            }
-        }
-    }
-
-    if (!settings.disabledUseRemoteCode && !settings.temporarilyDisabledUseRemoteCode && (!evilProjects || evilProjects < Date.now())) {
-        evilProjects = Date.now() + 300000
-        promises.push(fetchProjects())
-        async function fetchProjects() {
-            try {
-                const response = await fetch('https://serega007ru.github.io/Auto-Vote-Rating/projects.js')
-                const projects = await response.text()
-                if (!evil) {
-                    // noinspection JSUnresolvedVariable
-                    if (!self.evalCore) {
-                        importScripts('libs/evalCore.umd.js')
-                    }
-                    // noinspection JSUnresolvedFunction,JSUnresolvedVariable
-                    evil = evalCore.getEvalInstance(self)
-                }
-                evil(projects)
-            } catch (error) {
-                console.warn(getProjectPrefix(project, true), 'Ошибка при получении удалённого кода projects.js, использую вместо этого локальный код', error.message)
             }
         }
     }
@@ -429,24 +379,6 @@ async function silentVote(project) {
             return
         }
 
-        if (!settings.disabledUseRemoteCode && !settings.temporarilyDisabledUseRemoteCode) {
-            try {
-                const response = await fetch('https://serega007ru.github.io/Auto-Vote-Rating/scripts/' + (project.ratingMain || project.rating) + '_silentvote.js')
-                const textScript = await response.text()
-                if (!evil) {
-                    // noinspection JSUnresolvedVariable
-                    if (!self.evalCore) {
-                        importScripts('libs/evalCore.umd.js')
-                    }
-                    // noinspection JSUnresolvedFunction,JSUnresolvedVariable
-                    evil = evalCore.getEvalInstance(self)
-                }
-                evil(textScript)
-            } catch (error) {
-                console.warn(getProjectPrefix(project, true), 'Ошибка при получении удалённого кода scripts/' + (project.ratingMain || project.rating) + '_silentvote.js, использую вместо этого локальный код', error.message)
-            }
-        }
-
         if (!self['silentVote' + project.rating]) {
             importScripts('scripts/' + (project.ratingMain || project.rating) + '_silentvote.js')
         }
@@ -468,11 +400,7 @@ async function silentVote(project) {
         } else {
             let message
             if (error.stack) {
-                if (!settings.disabledUseRemoteCode && !settings.temporarilyDisabledUseRemoteCode) {
-                    message = error.toString()
-                } else {
-                    message = error.stack
-                }
+                message = error.stack
             } else {
                 message = error.message
             }
@@ -660,27 +588,6 @@ const webNavigationOnCompletedListener = async function(details) {
             return
         }
 
-        let eval = true
-        let textApi, textScript, textWorld
-        if (!settings.disabledUseRemoteCode && !settings.temporarilyDisabledUseRemoteCode) {
-            try {
-                const responseApi = await fetch('https://serega007ru.github.io/Auto-Vote-Rating/scripts/main/api.js')
-                textApi = await responseApi.text()
-                const responseScript = await fetch('https://serega007ru.github.io/Auto-Vote-Rating/scripts/' + (project.ratingMain || project.rating) + '.js')
-                textScript = await responseScript.text()
-                // noinspection JSUnresolvedVariable,JSUnresolvedFunction
-                if (allProjects[project.rating]?.needWorld?.()) {
-                    const responseWorld = await fetch('https://serega007ru.github.io/Auto-Vote-Rating/scripts/' + (project.ratingMain || project.rating) + '_world.js')
-                    textWorld = await responseWorld.text()
-                }
-            } catch (error) {
-                console.warn(getProjectPrefix(project, true), 'Ошибка при получении удалённого кода, использую вместо этого локальный код', error.message)
-                eval = false
-            }
-        } else {
-            eval = false
-        }
-
         try {
             if (allProjects[project.rating]?.needPrompt?.()) {
                 const funcPrompt = function(nick) {
@@ -695,30 +602,12 @@ const webNavigationOnCompletedListener = async function(details) {
                 await chrome.scripting.executeScript({target: {tabId: details.tabId}, world: 'MAIN', func: funcPrompt, args: [project.nick]})
             }
 
-            if (eval) {
-                if (settings.debug) console.log('Injecting libs/evalCore.umd.js, scripts/main/injectEval.js to ' + details.url)
-                await chrome.scripting.executeScript({target: {tabId: details.tabId}, files: ['libs/evalCore.umd.js', 'scripts/main/injectEval.js']})
-                await chrome.tabs.sendMessage(details.tabId, {textEval: true, textApi, textScript})
-                // noinspection JSUnresolvedVariable,JSUnresolvedFunction
-                if (allProjects[project.rating]?.needWorld?.()) {
-                    if (settings.debug) console.log('Injecting libs/evalCore.umd.js to ' + details.url + ' in MAIN world')
-                    await chrome.scripting.executeScript({target: {tabId: details.tabId}, world: 'MAIN', files: ['libs/evalCore.umd.js']})
-                    const funcWorld = function(text) {
-                        // noinspection JSUnresolvedFunction,JSUnresolvedVariable
-                        const evil = evalCore.getEvalInstance(window)
-                        evil(text)
-                    }
-                    if (settings.debug) console.log('Injecting funcWorld to ' + details.url + ' in MAIN world')
-                    await chrome.scripting.executeScript({target: {tabId: details.tabId}, world: 'MAIN', func: funcWorld, args: [textWorld]})
-                }
-            } else {
-                if (settings.debug) console.log('Injecting scripts/' + project.rating.toLowerCase() +'.js, scripts/main/api.js to ' + details.url)
-                await chrome.scripting.executeScript({target: {tabId: details.tabId}, files: ['scripts/main/hacktimer.js', 'scripts/' + (project.ratingMain || project.rating) +'.js', 'scripts/main/api.js']})
-                // noinspection JSUnresolvedVariable,JSUnresolvedFunction
-                if (allProjects[project.rating]?.needWorld?.()) {
-                    if (settings.debug) console.log('Injecting scripts/' + project.rating.toLowerCase() +'_world.js to ' + details.url + ' in MAIN world')
-                    await chrome.scripting.executeScript({target: {tabId: details.tabId}, world: 'MAIN', files: ['scripts/' + (project.ratingMain || project.rating) +'_world.js']})
-                }
+            if (settings.debug) console.log('Injecting scripts/' + project.rating.toLowerCase() +'.js, scripts/main/api.js to ' + details.url)
+            await chrome.scripting.executeScript({target: {tabId: details.tabId}, files: ['scripts/main/hacktimer.js', 'scripts/' + (project.ratingMain || project.rating) +'.js', 'scripts/main/api.js']})
+            // noinspection JSUnresolvedVariable,JSUnresolvedFunction
+            if (allProjects[project.rating]?.needWorld?.()) {
+                if (settings.debug) console.log('Injecting scripts/' + project.rating.toLowerCase() +'_world.js to ' + details.url + ' in MAIN world')
+                await chrome.scripting.executeScript({target: {tabId: details.tabId}, world: 'MAIN', files: ['scripts/' + (project.ratingMain || project.rating) +'_world.js']})
             }
 
             await chrome.tabs.sendMessage(details.tabId, {sendProject: true, project, settings})
@@ -1196,14 +1085,6 @@ async function endVote(request, sender, project) {
                 request.incorrectDomain = domain
             }
         }
-
-        if (!settings.disabledSendErrorSentry && !settings.disabledUseRemoteCode && !settings.temporarilyDisabledUseRemoteCode && !request.ignoreReport && !request.incorrectDomain && (request.message != null || request.errorVoteNoElement || request.emptyError || (request.timeout && settings.enabledReportTimeout) || (request.tooManyVoteAttempts && settings.enabledReportTooManyAttempts))) {
-            try {
-                await reportError(request, sender, project)
-            } catch (error) {
-                console.warn(getProjectPrefix(project, true), 'Ошибка отправки отчёта об ошибке', error.message)
-            }
-        }
     }
 
     if (sender && !request.closedTab) {
@@ -1211,25 +1092,6 @@ async function endVote(request, sender, project) {
             if (!settings.disableCloseTabsOnError) tryCloseTab(sender.tab.id, project, 0)
         } else {
             if (!settings.disableCloseTabsOnSuccess) tryCloseTab(sender.tab.id, project, 0)
-        }
-    }
-
-    if (!settings.disabledUseRemoteCode && !settings.temporarilyDisabledUseRemoteCode && (!evilProjects || evilProjects < Date.now())) {
-        evilProjects = Date.now() + 300000
-        try {
-            const response = await fetch('https://serega007ru.github.io/Auto-Vote-Rating/projects.js')
-            const projects = await response.text()
-            if (!evil) {
-                // noinspection JSUnresolvedVariable
-                if (!self.evalCore) {
-                    importScripts('libs/evalCore.umd.js')
-                }
-                // noinspection JSUnresolvedFunction,JSUnresolvedVariable
-                evil = evalCore.getEvalInstance(self)
-            }
-            evil(projects)
-        } catch (error) {
-            console.warn(getProjectPrefix(project, true), 'Ошибка при получении удалённого кода projects.js, использую вместо этого локальный код', error.message)
         }
     }
 
@@ -1509,153 +1371,6 @@ async function endVote(request, sender, project) {
     } catch (error) {
         console.warn(getProjectPrefix(project, true), 'Ошибка при создании chrome.alarms', error.message)
     }
-}
-
-
-async function reportError(request, sender, project) {
-    const reported = await db.get('other', 'sentryReported')
-    if (reported?.[project.rating] > Date.now()) return
-
-    let tabDetails
-    if (sender) {
-        await new Promise(resolve => {
-            chrome.pageCapture.saveAsMHTML({tabId: sender.tab.id}, function (details) {
-                const error = chrome.runtime.lastError?.message
-                if (error) {
-                    if (!error.includes('Cannot find the tab for this request')) {
-                        console.warn(getProjectPrefix(project, true), 'Ошибка получении скриншота вкладки для отправки отчёта об ошибке', error)
-                    }
-                    resolve()
-                    return
-                }
-                tabDetails = {}
-                tabDetails.mhtml = details
-                resolve()
-            })
-        })
-    }
-
-    if (!tabDetails && !request.html) return
-
-    sendReport(request, sender, tabDetails, project, reported)
-}
-
-async function sendReport(request, sender, tabDetails, project, reported) {
-    let titleError = project.rating + ' '
-    let detailsError
-    if (request.message != null) {
-        if (typeof request.message === 'string' && request.message.length > 0) {
-            titleError = titleError + request.message
-        } else if (typeof request.message === 'object') {
-            titleError = titleError + JSON.stringify(request.message)
-        } else {
-            titleError = titleError + 'Empty error'
-        }
-    } else if (request.errorVoteNoElement) {
-        titleError = titleError + 'No element'
-        detailsError = request.errorVoteNoElement
-    } else if (request.emptyError) {
-        titleError = titleError + 'Empty error'
-    } else if (request.timeout) {
-        titleError = titleError + 'Timeout'
-    } else if (request.tooManyVoteAttempts) {
-        titleError = titleError + 'Too many vote attempts'
-    }
-
-    const eventId = uuidv4()
-    const date = new Date()
-    const message1 = {}
-    message1.event_id = eventId
-    message1.sent_at = date.toISOString()
-    const message2 = {type: 'event'}
-    const message3 = {}
-    message3.message = titleError
-    message3.level = 'error'
-    message3.event_id = uuidv4()
-    message3.platform = 'javascript'
-    message3.timestamp = date.getTime() / 1000
-    message3.environment = 'production'
-    message3.release = 'Auto-Vote-Rating@' + chrome.runtime.getManifest().version
-    message3.extra = {}
-    if (detailsError) message3.extra.detailsError = detailsError
-    message3.extra.project = project
-    message3.extra.settings = settings
-    message3.request = {headers: {'User-Agent': self.navigator.userAgent}}
-    if (sender?.url) {
-        message3.request.url = sender.url
-    } else if (request.url) {
-        message3.request.url = request.url
-    } else {
-        message3.request.url = 'chrome-extension://mdfmiljoheedihbcfiifopgmlcincadd/background.js'
-    }
-    if (project.nick) {
-        message3.user = {}
-        message3.user.username = project.nick
-    }
-
-    const enc = new TextEncoder()
-
-    let body = enc.encode(JSON.stringify(message1) + '\n' + JSON.stringify(message2) + '\n' + JSON.stringify(message3))
-
-    if (request.html) {
-        if (!tabDetails) tabDetails = {}
-        tabDetails.html = request.html
-    }
-    if (tabDetails?.mhtml) {
-        // noinspection JSUnresolvedFunction
-        tabDetails.mhtml = new Uint8Array(await tabDetails.mhtml.arrayBuffer())
-    }
-
-    if (tabDetails) {
-        if (tabDetails.mhtml) {
-            const attachmentHTML = {}
-            attachmentHTML.type = 'attachment'
-            attachmentHTML.length = tabDetails.mhtml.length
-            attachmentHTML.filename = 'document.mhtml'
-            body = concatTypedArrays(body, enc.encode('\n' + JSON.stringify(attachmentHTML) + '\n'))
-            body = concatTypedArrays(body, tabDetails.mhtml)
-        }
-        if (tabDetails.html) {
-            const attachmentHTML = {}
-            const documentArrayBody = enc.encode(tabDetails.html)
-            attachmentHTML.type = 'attachment'
-            attachmentHTML.length = documentArrayBody.length
-            attachmentHTML.filename = 'document.html'
-            body = concatTypedArrays(body, enc.encode('\n' + JSON.stringify(attachmentHTML) + '\n'))
-            body = concatTypedArrays(body, documentArrayBody)
-        }
-    }
-
-    const options = {body}
-    options.method = 'POST'
-    try {
-        const response = await fetch("https://o1160467.ingest.sentry.io/api/6244963/envelope/?sentry_key=a9f5f15340e847fa9f8af7120188faf3", options)
-        const json = await response.json()
-        if (!response.ok) {
-            console.warn(getProjectPrefix(project, true), 'Ошибка отправки отчёта об ошибке', json)
-        } else {
-            console.log(getProjectPrefix(project, true), 'An error report has been sent, details:', json)
-        }
-    } catch (error) {
-        console.warn(getProjectPrefix(project, true), 'Ошибка отправки отчёта об ошибке', error.message)
-    } finally {
-        if (!reported) reported = {}
-        reported[project.rating] = Date.now() + 86400000
-        await db.put('other', reported, 'sentryReported')
-    }
-}
-
-function uuidv4() {
-    return ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g, c =>
-        (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
-    );
-}
-
-function concatTypedArrays(a, b) { // a, b TypedArray of same type
-    const c = new (a.constructor)(a.length + b.length)
-    c.set(a, 0)
-    c.set(b, a.length)
-    return c
 }
 
 //Отправитель уведомлений

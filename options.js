@@ -5,8 +5,6 @@ const initializeFunc = initializeConfig()
 let resolveLoad
 const loaded = new Promise(resolve => resolveLoad = resolve)
 
-let evil
-
 let editingProject
 
 const authVKUrls = new Map([
@@ -219,18 +217,6 @@ document.addEventListener('DOMContentLoaded', async()=>{
 
 window.addEventListener('load', async () => {
     await initializeFunc
-    if (!settings.disabledUseRemoteCode && !settings.temporarilyDisabledUseRemoteCode) {
-        if (!evil) { // noinspection JSUnresolvedVariable,JSUnresolvedFunction
-            evil = evalCore.getEvalInstance(self)
-        }
-        try {
-            const response = await fetch('https://serega007ru.github.io/Auto-Vote-Rating/projects.js')
-            const projects = await response.text()
-            evil(projects)
-        } catch (error) {
-            createNotif('Ошибка при получении удалённого кода, использую вместо этого локальный код' + error.message, 'warn')
-        }
-    }
     await reloadProjectList()
     generateDataList()
     document.getElementById('addedLoading').style.display = 'none'
@@ -257,16 +243,8 @@ async function restoreOptions(first) {
     document.getElementById('disabledDebug').checked = settings.debug
     document.getElementById('disableCloseTabsOnSuccess').checked = settings.disableCloseTabsOnSuccess
     document.getElementById('disableCloseTabsOnError').checked = settings.disableCloseTabsOnError
-    document.getElementById('disabledUseRemoteCode').checked = settings.disabledUseRemoteCode
-    document.getElementById('disabledSendErrorSentry').checked = settings.disabledSendErrorSentry
     document.getElementById('expertMode').checked = settings.expertMode
     document.getElementById('expertMode').dispatchEvent(new Event('change'))
-    if (settings.temporarilyDisabledUseRemoteCode) {
-        document.getElementById('disabledUseRemoteCode').checked = true
-        document.getElementById('disabledUseRemoteCode').disabled = true
-        document.getElementById('disabledSendErrorSentry').checked = true
-        document.getElementById('disabledSendErrorSentry').disabled = true
-    }
     if (first) {
         document.getElementById('addTab').classList.add('active')
         document.getElementById('load').style.display = 'none'
@@ -646,10 +624,6 @@ for (const check of document.querySelectorAll('input[name=checkbox]')) {
             settings.disableCloseTabsOnSuccess = this.checked
         else if (this.id === 'disableCloseTabsOnError')
             settings.disableCloseTabsOnError = this.checked
-        else if (this.id === 'disabledUseRemoteCode')
-            settings.disabledUseRemoteCode = this.checked
-        else if (this.id === 'disabledSendErrorSentry')
-            settings.disabledSendErrorSentry = this.checked
         else if (this.id === 'expertMode') {
             settings.expertMode = this.checked
             if (this.checked) {

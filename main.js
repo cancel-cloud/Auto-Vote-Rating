@@ -157,10 +157,6 @@ async function upgrade(db, oldVersion, newVersion, transaction) {
             timeoutVote: 900000,
             disabledWarnCaptcha: false,
             debug: false,
-            disabledUseRemoteCode: false,
-            disabledSendErrorSentry: false,
-            // TODO временный код
-            temporarilyDisabledUseRemoteCode: true,
             expertMode: false
         }
         await other.add(settings, 'settings')
@@ -490,11 +486,6 @@ async function upgrade(db, oldVersion, newVersion, transaction) {
             // noinspection JSVoidFunctionReturnValueUsed
             cursor = await cursor.continue()
         }
-
-        // TODO временный код
-        settings = await transaction.objectStore('other').get('settings')
-        settings.temporarilyDisabledUseRemoteCode = true
-        await transaction.objectStore('other').put(settings, 'settings')
     }
 
     if (!todayStats) {
