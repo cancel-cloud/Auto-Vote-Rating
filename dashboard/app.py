@@ -140,6 +140,26 @@ def get_stats():
         return jsonify({'success': False, 'error': str(e)}), 500
 
 
+@app.route('/health', methods=['GET'])
+def health_check():
+    """Health check endpoint for monitoring"""
+    try:
+        # Check if database is accessible
+        db.get_settings()
+        return jsonify({
+            'status': 'healthy',
+            'service': 'auto-vote-rating',
+            'timestamp': datetime.now().isoformat()
+        }), 200
+    except Exception as e:
+        logger.error(f"Health check failed: {e}")
+        return jsonify({
+            'status': 'unhealthy',
+            'error': str(e),
+            'timestamp': datetime.now().isoformat()
+        }), 503
+
+
 @app.route('/api/projects/<key>/restart', methods=['POST'])
 def restart_project(key):
     """Restart voting for a project (vote now)"""

@@ -1,4 +1,23 @@
-# Auto Vote Rating - Chrome Extension
+# Auto Vote Rating
+
+## 🐳 Docker Version Available!
+
+**NEW:** You can now run Auto Vote Rating as a self-hosted Docker container! Perfect for 24/7 automation.
+
+👉 **[See Docker Setup Instructions](DOCKER-README.md)**
+
+Benefits of Docker version:
+- ✅ Runs 24/7 without needing browser open
+- ✅ Web dashboard accessible from any device
+- ✅ Easy deployment with docker-compose
+- ✅ Same functionality as browser extension
+- ✅ Perfect for servers and always-on systems
+
+---
+
+## Browser Extension
+
+### Chrome Extension
 <details>
 <summary>List of sites that the extension supports</summary>
 <a href="http://topcraft.club/">topcraft.club</a>  
