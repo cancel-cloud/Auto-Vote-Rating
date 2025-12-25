@@ -23,7 +23,7 @@ svgFail.src = 'images/icons/error.svg'
 const svgSuccess = document.createElement('img')
 svgSuccess.src = 'images/icons/success.svg'
 
-//Локализация
+//Localization
 const elements = document.querySelectorAll('[data-resource]')
 elements.forEach(function(el) {
     el.prepend(chrome.i18n.getMessage(el.getAttribute('data-resource')))

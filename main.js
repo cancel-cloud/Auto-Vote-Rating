@@ -1,19 +1,19 @@
-//Настройки
+//Settings
 // noinspection ES6ConvertVarToLetConst
 var settings
-//Общая статистика
+//General statistics
 // noinspection ES6ConvertVarToLetConst
 var generalStats
-//Статистика за сегодня
+//Today's statistics
 // noinspection ES6ConvertVarToLetConst
 var todayStats
-//Оновная база данных
+//Main database
 // noinspection ES6ConvertVarToLetConst
 var db
-//База данных логов
+//Logs database
 // noinspection ES6ConvertVarToLetConst
 var dbLogs
-//Текущие открытые вкладки расширением
+//Currently opened tabs by the extension
 // noinspection ES6ConvertVarToLetConst
 var openedProjects = new Map()
 let onLine
@@ -54,7 +54,7 @@ function onUnhandledError(event) {
     }
 }
 
-//Инициализация настроек расширения
+//Initialize extension settings
 async function initializeConfig(background, version) {
     if (!dbLogs) {
         dbLogs = await idb.openDB('logs', 1, {
@@ -67,13 +67,13 @@ async function initializeConfig(background, version) {
     try {
         db = await idb.openDB('avr', version ? version : 15, {upgrade})
     } catch (error) {
-        //На случай если это версия MultiVote
+        //In case this is MultiVote version
         if (error.name === 'VersionError') {
             if (version) {
                 dbError({target: {source: {name: 'avr'}, error: error}})
                 return
             }
-            console.log('Ошибка версии базы данных, возможно вы на версии MultiVote, пытаемся загрузить настройки версии MultiVote')
+            console.log('Database version error, you may be on MultiVote version, trying to load MultiVote version settings')
             await initializeConfig(background, 150)
             return
         }

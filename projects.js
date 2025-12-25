@@ -1,4 +1,4 @@
-//Список рейтингов
+//List of ratings
 // noinspection JSUnusedGlobalSymbols,ES6ConvertVarToLetConst,SpellCheckingInspection,HttpUrlsUsage
 
 var allProjects = {
