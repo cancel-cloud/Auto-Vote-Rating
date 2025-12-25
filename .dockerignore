@@ -1,0 +1,49 @@
+# Git files
+.git
+.gitignore
+.gitattributes
+
+# Docker files
+.dockerignore
+Dockerfile
+docker-compose.yml
+
+# Data directory (will be mounted as volume)
+data/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+.venv
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Temporary files
+*.tmp
+tmp/
+
+# Documentation (keep in image but exclude working files)
+*.md.tmp
+
+# Build artifacts
+build/
+dist/
+*.egg-info/
