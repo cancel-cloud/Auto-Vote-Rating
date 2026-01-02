@@ -261,14 +261,53 @@
                     <select id="rating" name="rating" required>
                         <option value="">Select a site...</option>
                         <option value="minecraft-server.eu">minecraft-server.eu</option>
+                        <option value="minecraft-serverlist.net">minecraft-serverlist.net</option>
                         <option value="topcraft.club">topcraft.club</option>
                         <option value="mctop.su">mctop.su</option>
                         <option value="mcrate.su">mcrate.su</option>
+                        <option value="minecraftrating.ru">minecraftrating.ru</option>
+                        <option value="monitoringminecraft.ru">monitoringminecraft.ru</option>
+                        <option value="ionmc.top">ionmc.top</option>
                         <option value="minecraftservers.org">minecraftservers.org</option>
+                        <option value="serveur-prive.net">serveur-prive.net</option>
                         <option value="planetminecraft.com">planetminecraft.com</option>
                         <option value="topg.org">topg.org</option>
+                        <option value="minecraft-mp.com">minecraft-mp.com</option>
+                        <option value="minecraft-server-list.com">minecraft-server-list.com</option>
+                        <option value="serverpact.com">serverpact.com</option>
+                        <option value="minecraftiplist.com">minecraftiplist.com</option>
+                        <option value="topminecraftservers.org">topminecraftservers.org</option>
+                        <option value="minecraftservers.biz">minecraftservers.biz</option>
+                        <option value="hotmc.ru">hotmc.ru</option>
                         <option value="minecraft-server.net">minecraft-server.net</option>
+                        <option value="top-games.net">top-games.net</option>
+                        <option value="tmonitoring.com">tmonitoring.com</option>
+                        <option value="top.gg">top.gg</option>
+                        <option value="discordbotlist.com">discordbotlist.com</option>
+                        <option value="discords.com">discords.com</option>
+                        <option value="mmotop.ru">mmotop.ru</option>
+                        <option value="mc-servers.com">mc-servers.com</option>
                         <option value="minecraftlist.org">minecraftlist.org</option>
+                        <option value="minecraft-index.com">minecraft-index.com</option>
+                        <option value="serverlist101.com">serverlist101.com</option>
+                        <option value="mcserver-list.eu">mcserver-list.eu</option>
+                        <option value="craftlist.org">craftlist.org</option>
+                        <option value="czech-craft.eu">czech-craft.eu</option>
+                        <option value="minecraft.buzz">minecraft.buzz</option>
+                        <option value="minecraftservery.eu">minecraftservery.eu</option>
+                        <option value="rpg-paradize.com">rpg-paradize.com</option>
+                        <option value="minecraftkrant.nl">minecraftkrant.nl</option>
+                        <option value="trackyserver.com">trackyserver.com</option>
+                        <option value="mc-lists.org">mc-lists.org</option>
+                        <option value="topmcservers.com">topmcservers.com</option>
+                        <option value="bestservers.com">bestservers.com</option>
+                        <option value="craft-list.net">craft-list.net</option>
+                        <option value="minecraft-servers-list.org">minecraft-servers-list.org</option>
+                        <option value="serverliste.net">serverliste.net</option>
+                        <option value="gtop100.com">gtop100.com</option>
+                        <option value="wargm.ru">wargm.ru</option>
+                        <option value="minestatus.net">minestatus.net</option>
+                        <option value="misterlauncher.org">misterlauncher.org</option>
                     </select>
                     <small style="color: #888; display: block; margin-top: 5px;">
                         Auto-filled from URL or select manually
@@ -396,14 +435,19 @@
     </div>
     
     <script>
-        // URL parsing for project setup
+        // URL parsing for project setup - All supported voting sites
         const URL_PATTERNS = {
             'minecraft-server.eu': {
                 regex: /minecraft-server\.eu\/vote\/index\/([A-Z0-9]+)/i,
                 example: 'https://minecraft-server.eu/vote/index/208F7/'
             },
+            'minecraft-serverlist.net': {
+                regex: /minecraft-serverlist\.net\/vote\/(\d+)/i,
+                example: 'https://www.minecraft-serverlist.net/vote/51076/'
+            },
             'topcraft.club': {
-                regex: /topcraft\.club\/servers\/(\d+)/i,
+                regex: /topcraft\.(club|ru)\/servers\/(\d+)/i,
+                idIndex: 2,
                 example: 'https://topcraft.club/servers/10496/'
             },
             'mctop.su': {
@@ -415,10 +459,27 @@
                 idIndex: 2,
                 example: 'http://mcrate.su/rate/4396'
             },
+            'minecraftrating.ru': {
+                regex: /minecraftrating\.ru\/(projects|vote)\/([^\/]+)/i,
+                idIndex: 2,
+                example: 'https://minecraftrating.ru/projects/example/'
+            },
+            'monitoringminecraft.ru': {
+                regex: /monitoringminecraft\.ru\/top\/([^\/]+)/i,
+                example: 'https://monitoringminecraft.ru/top/example/'
+            },
+            'ionmc.top': {
+                regex: /ionmc\.top\/projects\/(\d+)/i,
+                example: 'https://ionmc.top/projects/80/'
+            },
             'minecraftservers.org': {
                 regex: /minecraftservers\.org\/(vote|server)\/(\d+)/i,
                 idIndex: 2,
                 example: 'https://minecraftservers.org/vote/25531'
+            },
+            'serveur-prive.net': {
+                regex: /serveur-prive\.net\/.*?\/([^\/]+)\/vote/i,
+                example: 'https://serveur-prive.net/minecraft/example/vote'
             },
             'planetminecraft.com': {
                 regex: /planetminecraft\.com\/server\/([^\/]+)/i,
@@ -429,15 +490,160 @@
                 idIndex: 2,
                 example: 'https://topg.org/minecraft/vote/12345'
             },
+            'minecraft-mp.com': {
+                regex: /minecraft-mp\.com\/(vote|server)\/([^\/]+)/i,
+                idIndex: 2,
+                example: 'https://minecraft-mp.com/vote/example'
+            },
+            'minecraft-server-list.com': {
+                regex: /minecraft-server-list\.com\/(vote|server)\/([^\/]+)/i,
+                idIndex: 2,
+                example: 'https://minecraft-server-list.com/vote/example'
+            },
+            'serverpact.com': {
+                regex: /serverpact\.com\/.*?\/([^\/]+)/i,
+                example: 'https://serverpact.com/server/example'
+            },
+            'minecraftiplist.com': {
+                regex: /minecraftiplist\.com\/.*?\/([^\/]+)/i,
+                example: 'https://minecraftiplist.com/server/example'
+            },
+            'topminecraftservers.org': {
+                regex: /topminecraftservers\.org\/(vote|server)\/(\d+)/i,
+                idIndex: 2,
+                example: 'https://topminecraftservers.org/vote/12345'
+            },
+            'minecraftservers.biz': {
+                regex: /minecraftservers\.biz\/(vote|server)\/([^\/]+)/i,
+                idIndex: 2,
+                example: 'https://minecraftservers.biz/vote/example'
+            },
+            'hotmc.ru': {
+                regex: /hotmc\.ru\/.*?\/([^\/]+)/i,
+                example: 'https://hotmc.ru/server/example'
+            },
             'minecraft-server.net': {
                 regex: /minecraft-server\.net\/(vote|server)\/([^\/]+)/i,
                 idIndex: 2,
                 example: 'https://minecraft-server.net/vote/example'
             },
+            'top-games.net': {
+                regex: /top-(games|serveurs)\.net\/.*?\/([^\/]+)/i,
+                idIndex: 2,
+                example: 'https://top-games.net/minecraft/example'
+            },
+            'tmonitoring.com': {
+                regex: /tmonitoring\.com\/.*?\/([^\/]+)/i,
+                example: 'https://tmonitoring.com/server/example'
+            },
+            'top.gg': {
+                regex: /top\.gg\/(bot|server)\/(\d+)/i,
+                idIndex: 2,
+                example: 'https://top.gg/bot/123456'
+            },
+            'discordbotlist.com': {
+                regex: /discordbotlist\.com\/bots\/([^\/]+)/i,
+                example: 'https://discordbotlist.com/bots/example'
+            },
+            'discords.com': {
+                regex: /discords\.com\/(bots|servers)\/([^\/]+)/i,
+                idIndex: 2,
+                example: 'https://discords.com/bots/example'
+            },
+            'mmotop.ru': {
+                regex: /mmotop\.ru\/.*?\/([^\/]+)/i,
+                example: 'https://mmotop.ru/server/example'
+            },
+            'mc-servers.com': {
+                regex: /mc-servers\.com\/(vote|server)\/([^\/]+)/i,
+                idIndex: 2,
+                example: 'https://mc-servers.com/vote/example'
+            },
             'minecraftlist.org': {
                 regex: /minecraftlist\.org\/(vote|server)\/([^\/]+)/i,
                 idIndex: 2,
                 example: 'https://minecraftlist.org/vote/example'
+            },
+            'minecraft-index.com': {
+                regex: /minecraft-index\.com\/(vote|server)\/([^\/]+)/i,
+                idIndex: 2,
+                example: 'https://minecraft-index.com/vote/example'
+            },
+            'serverlist101.com': {
+                regex: /serverlist101\.com\/.*?\/([^\/]+)/i,
+                example: 'https://serverlist101.com/server/example'
+            },
+            'mcserver-list.eu': {
+                regex: /mcserver-list\.eu\/.*?\/([^\/]+)/i,
+                example: 'https://mcserver-list.eu/server/example'
+            },
+            'craftlist.org': {
+                regex: /craftlist\.org\/.*?\/([^\/]+)/i,
+                example: 'https://craftlist.org/server/example'
+            },
+            'czech-craft.eu': {
+                regex: /czech-craft\.eu\/.*?\/([^\/]+)/i,
+                example: 'https://czech-craft.eu/server/example'
+            },
+            'minecraft.buzz': {
+                regex: /minecraft\.buzz\/.*?\/([^\/]+)/i,
+                example: 'https://minecraft.buzz/server/example'
+            },
+            'minecraftservery.eu': {
+                regex: /minecraftservery\.eu\/.*?\/([^\/]+)/i,
+                example: 'https://minecraftservery.eu/server/example'
+            },
+            'rpg-paradize.com': {
+                regex: /rpg-paradize\.com\/.*?\/([^\/]+)/i,
+                example: 'https://rpg-paradize.com/server/example'
+            },
+            'minecraftkrant.nl': {
+                regex: /minecraftkrant\.nl\/.*?\/([^\/]+)/i,
+                example: 'https://minecraftkrant.nl/server/example'
+            },
+            'trackyserver.com': {
+                regex: /trackyserver\.com\/.*?\/([^\/]+)/i,
+                example: 'https://trackyserver.com/server/example'
+            },
+            'mc-lists.org': {
+                regex: /mc-lists\.org\/.*?\/([^\/]+)/i,
+                example: 'https://mc-lists.org/server/example'
+            },
+            'topmcservers.com': {
+                regex: /topmcservers\.com\/.*?\/([^\/]+)/i,
+                example: 'https://topmcservers.com/server/example'
+            },
+            'bestservers.com': {
+                regex: /bestservers\.com\/.*?\/([^\/]+)/i,
+                example: 'https://bestservers.com/server/example'
+            },
+            'craft-list.net': {
+                regex: /craft-list\.net\/.*?\/([^\/]+)/i,
+                example: 'https://craft-list.net/server/example'
+            },
+            'minecraft-servers-list.org': {
+                regex: /minecraft-servers-list\.org\/.*?\/([^\/]+)/i,
+                example: 'https://minecraft-servers-list.org/server/example'
+            },
+            'serverliste.net': {
+                regex: /serverliste\.net\/.*?\/([^\/]+)/i,
+                example: 'https://serverliste.net/server/example'
+            },
+            'gtop100.com': {
+                regex: /gtop100\.com\/.*?\/([^\/]+)/i,
+                example: 'https://gtop100.com/server/example'
+            },
+            'wargm.ru': {
+                regex: /wargm\.ru\/.*?\/([^\/]+)/i,
+                example: 'https://wargm.ru/server/example'
+            },
+            'minestatus.net': {
+                regex: /minestatus\.net\/.*?\/([^\/]+)/i,
+                example: 'https://minestatus.net/server/example'
+            },
+            'misterlauncher.org': {
+                regex: /misterlauncher\.org\/.*?\/([^\/]+)/i,
+                example: 'https://misterlauncher.org/server/example'
             }
         };
         
@@ -448,12 +654,12 @@
                 url = 'https://' + url;
             }
             
-            // Remove trailing slash
-            url = url.replace(/\/$/, '');
+            // Remove trailing slash for matching
+            const urlForMatching = url.replace(/\/$/, '');
             
             // Try to match against each pattern
             for (const [provider, pattern] of Object.entries(URL_PATTERNS)) {
-                const match = url.match(pattern.regex);
+                const match = urlForMatching.match(pattern.regex);
                 if (match) {
                     const idIndex = pattern.idIndex || 1;
                     return {

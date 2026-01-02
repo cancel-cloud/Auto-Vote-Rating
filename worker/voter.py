@@ -93,19 +93,56 @@ class Voter:
         rating = project.get('rating')
         project_id = project.get('id')
         
-        # Load project definitions
-        # For now, we'll construct URLs based on common patterns
-        
+        # Comprehensive URL patterns for all supported voting sites
         url_patterns = {
             'minecraft-server.eu': f'https://minecraft-server.eu/vote/index/{project_id}',
+            'minecraft-serverlist.net': f'https://www.minecraft-serverlist.net/vote/{project_id}',
             'topcraft.club': f'https://topcraft.club/servers/{project_id}/vote/',
             'mctop.su': f'https://mctop.su/servers/{project_id}/vote/',
             'mcrate.su': f'http://mcrate.su/rate/{project_id}',
+            'minecraftrating.ru': f'https://minecraftrating.ru/projects/{project_id}/',
+            'monitoringminecraft.ru': f'https://monitoringminecraft.ru/top/{project_id}/vote',
+            'ionmc.top': f'https://ionmc.top/projects/{project_id}/vote',
             'minecraftservers.org': f'https://minecraftservers.org/vote/{project_id}',
+            'serveur-prive.net': f'https://serveur-prive.net/minecraft/{project_id}/vote',
             'planetminecraft.com': f'https://www.planetminecraft.com/server/{project_id}/',
             'topg.org': f'https://topg.org/minecraft/vote/{project_id}',
+            'minecraft-mp.com': f'https://minecraft-mp.com/vote/{project_id}',
+            'minecraft-server-list.com': f'https://minecraft-server-list.com/vote/{project_id}',
+            'serverpact.com': f'https://serverpact.com/server/{project_id}',
+            'minecraftiplist.com': f'https://minecraftiplist.com/server/{project_id}',
+            'topminecraftservers.org': f'https://topminecraftservers.org/vote/{project_id}',
+            'minecraftservers.biz': f'https://minecraftservers.biz/vote/{project_id}',
+            'hotmc.ru': f'https://hotmc.ru/server/{project_id}',
             'minecraft-server.net': f'https://minecraft-server.net/vote/{project_id}',
+            'top-games.net': f'https://top-games.net/minecraft/{project_id}',
+            'tmonitoring.com': f'https://tmonitoring.com/server/{project_id}',
+            'top.gg': f'https://top.gg/bot/{project_id}',
+            'discordbotlist.com': f'https://discordbotlist.com/bots/{project_id}',
+            'discords.com': f'https://discords.com/bots/{project_id}',
+            'mmotop.ru': f'https://mmotop.ru/server/{project_id}',
+            'mc-servers.com': f'https://mc-servers.com/vote/{project_id}',
             'minecraftlist.org': f'https://minecraftlist.org/vote/{project_id}',
+            'minecraft-index.com': f'https://minecraft-index.com/vote/{project_id}',
+            'serverlist101.com': f'https://serverlist101.com/server/{project_id}',
+            'mcserver-list.eu': f'https://mcserver-list.eu/server/{project_id}',
+            'craftlist.org': f'https://craftlist.org/server/{project_id}',
+            'czech-craft.eu': f'https://czech-craft.eu/server/{project_id}',
+            'minecraft.buzz': f'https://minecraft.buzz/server/{project_id}',
+            'minecraftservery.eu': f'https://minecraftservery.eu/server/{project_id}',
+            'rpg-paradize.com': f'https://rpg-paradize.com/server/{project_id}',
+            'minecraftkrant.nl': f'https://minecraftkrant.nl/server/{project_id}',
+            'trackyserver.com': f'https://trackyserver.com/server/{project_id}',
+            'mc-lists.org': f'https://mc-lists.org/server/{project_id}',
+            'topmcservers.com': f'https://topmcservers.com/server/{project_id}',
+            'bestservers.com': f'https://bestservers.com/server/{project_id}',
+            'craft-list.net': f'https://craft-list.net/server/{project_id}',
+            'minecraft-servers-list.org': f'https://minecraft-servers-list.org/server/{project_id}',
+            'serverliste.net': f'https://serverliste.net/server/{project_id}',
+            'gtop100.com': f'https://gtop100.com/server/{project_id}',
+            'wargm.ru': f'https://wargm.ru/server/{project_id}',
+            'minestatus.net': f'https://minestatus.net/server/{project_id}',
+            'misterlauncher.org': f'https://misterlauncher.org/server/{project_id}',
         }
         
         # Use custom URL if provided
