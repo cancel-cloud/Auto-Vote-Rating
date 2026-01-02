@@ -1,4 +1,27 @@
-# Auto Vote Rating - Chrome Extension
+# Auto Vote Rating - Docker Container
+
+A self-hosted Docker container for automated voting on gaming server listing sites with 24/7 operation and web dashboard.
+
+## 🐳 Quick Start
+
+```bash
+docker-compose up -d
+# Access dashboard at http://localhost:8080
+```
+
+👉 **[See Complete Setup Instructions](DOCKER-README.md)**
+
+## Features
+
+- ✅ Runs 24/7 without needing browser open
+- ✅ Web dashboard accessible from any device
+- ✅ Easy deployment with docker-compose
+- ✅ Vote reminder/assistant mode (no automatic submission)
+- ✅ Flexible scheduling with retry logic
+- ✅ URL parsing for easy project setup
+- ✅ Perfect for servers and always-on systems
+
+## Supported Sites
 <details>
 <summary>List of sites that the extension supports</summary>
 <a href="http://topcraft.club/">topcraft.club</a>  

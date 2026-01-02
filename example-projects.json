@@ -1,0 +1,42 @@
+# Example Projects Configuration
+# This file shows how to manually add projects to data/projects.json
+# You can also add projects through the web dashboard
+
+{
+  "0": {
+    "key": "0",
+    "rating": "topcraft.club",
+    "id": "10496",
+    "nick": "YourMinecraftUsername",
+    "name": "My Server",
+    "time": null,
+    "stats": {
+      "successVotes": 0,
+      "errorVotes": 0,
+      "laterVotes": 0,
+      "monthSuccessVotes": 0,
+      "lastMonthSuccessVotes": 0,
+      "lastSuccessVote": null,
+      "lastAttemptVote": null,
+      "added": 1703548800000
+    }
+  },
+  "1": {
+    "key": "1",
+    "rating": "minecraftservers.org",
+    "id": "25531",
+    "nick": "YourUsername",
+    "name": "Another Server",
+    "time": null,
+    "stats": {
+      "successVotes": 0,
+      "errorVotes": 0,
+      "laterVotes": 0,
+      "monthSuccessVotes": 0,
+      "lastMonthSuccessVotes": 0,
+      "lastSuccessVote": null,
+      "lastAttemptVote": null,
+      "added": 1703548800000
+    }
+  }
+}
