@@ -82,6 +82,14 @@ class VoteWorker:
             projects = self.db.get_all_projects()
             current_time = datetime.now()
             
+            # Reset daily retry counters at midnight
+            for project in projects:
+                if project.get('lastAttemptAt'):
+                    last_attempt = datetime.fromtimestamp(project['lastAttemptAt'] / 1000)
+                    if last_attempt.date() < current_time.date():
+                        project['retriesTodayCount'] = 0
+                        self.db.update_project(project)
+            
             for project in projects:
                 # Skip if voting is disabled
                 if project.get('disabled', False):
@@ -102,29 +110,103 @@ class VoteWorker:
         except Exception as e:
             logger.error(f"Error in check_and_vote: {e}", exc_info=True)
     
+    def calculate_next_vote_time(self, project: Dict, is_retry: bool = False) -> datetime:
+        """Calculate next vote time with flexible scheduling and jitter"""
+        settings = self.db.get_settings()
+        
+        if is_retry and settings.get('retryEnabled', True):
+            # Same-day retry with exponential backoff
+            retry_count = project.get('retriesTodayCount', 0)
+            max_retries = settings.get('maxRetriesPerDay', 3)
+            
+            if retry_count < max_retries:
+                # Exponential backoff: 30min, 1hr, 2hr, etc.
+                min_delay = settings.get('retryMinDelayMinutes', 30)
+                max_delay = settings.get('retryMaxDelayMinutes', 180)
+                
+                # Calculate exponential delay
+                delay_minutes = min(min_delay * (2 ** retry_count), max_delay)
+                
+                # Add jitter (±20%)
+                import random
+                jitter = random.uniform(0.8, 1.2)
+                delay_minutes = int(delay_minutes * jitter)
+                
+                next_time = datetime.now() + timedelta(minutes=delay_minutes)
+                
+                # Check if still within daily window
+                earliest = settings.get('earliestTime', '09:00')
+                latest = settings.get('latestTime', '21:00')
+                
+                earliest_hour, earliest_min = map(int, earliest.split(':'))
+                latest_hour, latest_min = map(int, latest.split(':'))
+                
+                window_end = datetime.now().replace(hour=latest_hour, minute=latest_min, second=0, microsecond=0)
+                
+                if next_time < window_end:
+                    return next_time
+        
+        # Next day scheduling with random time in window
+        import random
+        settings = self.db.get_settings()
+        
+        earliest = settings.get('earliestTime', '09:00')
+        latest = settings.get('latestTime', '21:00')
+        
+        earliest_hour, earliest_min = map(int, earliest.split(':'))
+        latest_hour, latest_min = map(int, latest.split(':'))
+        
+        # Calculate next day
+        next_day = datetime.now() + timedelta(days=1)
+        
+        # Random hour and minute within window
+        hour_range = latest_hour - earliest_hour
+        random_hour = earliest_hour + random.randint(0, hour_range)
+        random_minute = random.randint(0, 59)
+        
+        # Add jitter (±10 minutes)
+        jitter_minutes = random.randint(-10, 10)
+        
+        next_time = next_day.replace(hour=random_hour, minute=random_minute, second=0, microsecond=0)
+        next_time += timedelta(minutes=jitter_minutes)
+        
+        # Ensure it's within the window
+        earliest_time = next_day.replace(hour=earliest_hour, minute=earliest_min, second=0, microsecond=0)
+        latest_time = next_day.replace(hour=latest_hour, minute=latest_min, second=0, microsecond=0)
+        
+        next_time = max(earliest_time, min(next_time, latest_time))
+        
+        return next_time
+    
     def vote_for_project(self, project: Dict):
-        """Execute voting for a specific project"""
+        """Execute voting for a specific project - REMINDER MODE (no auto-submission)"""
         try:
             # Update last attempt time
             project['stats'] = project.get('stats', {})
             project['stats']['lastAttemptVote'] = int(datetime.now().timestamp() * 1000)
+            project['lastAttemptAt'] = int(datetime.now().timestamp() * 1000)
             self.db.update_project(project)
             
-            # Execute the vote
+            # Execute the vote (opens page and notifies user - NO AUTO-SUBMISSION)
             result = self.voter.vote(project)
             
             # Update project based on result
             if result['success']:
-                logger.info(f"Successfully voted for {self.get_project_prefix(project)}")
+                logger.info(f"Vote page opened for {self.get_project_prefix(project)} - User action required")
                 
                 # Update statistics
                 project['stats']['successVotes'] = project['stats'].get('successVotes', 0) + 1
                 project['stats']['monthSuccessVotes'] = project['stats'].get('monthSuccessVotes', 0) + 1
                 project['stats']['lastSuccessVote'] = int(datetime.now().timestamp() * 1000)
+                project['lastSuccessAt'] = int(datetime.now().timestamp() * 1000)
                 
-                # Calculate next vote time (default: 24 hours)
-                next_vote = datetime.now() + timedelta(hours=24)
+                # Reset retry counter on success
+                project['retriesTodayCount'] = 0
+                
+                # Calculate next vote time for next day
+                next_vote = self.calculate_next_vote_time(project, is_retry=False)
                 project['time'] = int(next_vote.timestamp() * 1000)
+                project['nextAttemptAt'] = int(next_vote.timestamp() * 1000)
                 
                 # Clear any errors
                 if 'error' in project:
@@ -132,17 +214,22 @@ class VoteWorker:
                     
             else:
                 error_msg = result.get('error', 'Unknown error')
-                logger.error(f"Failed to vote for {self.get_project_prefix(project)}: {error_msg}")
+                logger.error(f"Failed to open vote page for {self.get_project_prefix(project)}: {error_msg}")
                 
                 # Update statistics
                 project['stats']['errorVotes'] = project['stats'].get('errorVotes', 0) + 1
                 project['error'] = error_msg
+                project['lastError'] = error_msg
                 
-                # Retry after configured timeout (default: 15 minutes)
-                settings = self.db.get_settings()
-                retry_timeout = settings.get('timeoutError', 900000)  # 15 minutes in ms
-                next_vote = datetime.now() + timedelta(milliseconds=retry_timeout)
+                # Increment retry counter
+                project['retriesTodayCount'] = project.get('retriesTodayCount', 0) + 1
+                
+                # Calculate next attempt time with retry logic
+                next_vote = self.calculate_next_vote_time(project, is_retry=True)
                 project['time'] = int(next_vote.timestamp() * 1000)
+                project['nextAttemptAt'] = int(next_vote.timestamp() * 1000)
+                
+                logger.info(f"Retry {project['retriesTodayCount']} scheduled for {next_vote}")
             
             # Save updated project
             self.db.update_project(project)

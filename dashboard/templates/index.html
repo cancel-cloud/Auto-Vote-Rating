@@ -249,21 +249,38 @@
             <h2>Add New Project</h2>
             <form id="add-project-form">
                 <div class="form-group">
+                    <label for="vote-url">Vote Link URL *</label>
+                    <input type="text" id="vote-url" placeholder="Paste your vote link here (e.g., https://minecraft-server.eu/vote/index/208F7/)">
+                    <small style="color: #888; display: block; margin-top: 5px;">
+                        Paste a vote URL and we'll auto-detect the site and project ID
+                    </small>
+                </div>
+                
+                <div class="form-group">
                     <label for="rating">Rating Site *</label>
                     <select id="rating" name="rating" required>
                         <option value="">Select a site...</option>
+                        <option value="minecraft-server.eu">minecraft-server.eu</option>
                         <option value="topcraft.club">topcraft.club</option>
                         <option value="mctop.su">mctop.su</option>
                         <option value="mcrate.su">mcrate.su</option>
                         <option value="minecraftservers.org">minecraftservers.org</option>
                         <option value="planetminecraft.com">planetminecraft.com</option>
                         <option value="topg.org">topg.org</option>
+                        <option value="minecraft-server.net">minecraft-server.net</option>
+                        <option value="minecraftlist.org">minecraftlist.org</option>
                     </select>
+                    <small style="color: #888; display: block; margin-top: 5px;">
+                        Auto-filled from URL or select manually
+                    </small>
                 </div>
                 
                 <div class="form-group">
                     <label for="project-id">Project ID *</label>
-                    <input type="text" id="project-id" name="id" placeholder="Enter project ID" required>
+                    <input type="text" id="project-id" name="id" placeholder="Enter or auto-filled from URL" required>
+                    <small style="color: #888; display: block; margin-top: 5px;">
+                        Auto-filled from URL or enter manually
+                    </small>
                 </div>
                 
                 <div class="form-group">
@@ -276,6 +293,8 @@
                     <input type="text" id="name" name="name" placeholder="Project display name">
                 </div>
                 
+                <div id="url-parse-error" style="display:none; color:#e74c3c; padding:10px; background:#3d1f1f; border-radius:4px; margin:10px 0;"></div>
+                
                 <button type="submit" class="btn">Add Project</button>
             </form>
         </div>
@@ -284,20 +303,67 @@
         <div id="settings" class="tab-content">
             <h2>Settings</h2>
             <form id="settings-form">
+                <!-- Debug Mode Section - Grouped -->
+                <div class="form-group" style="border: 1px solid #4d4d4d; padding: 15px; border-radius: 8px; background: #3d3d3d;">
+                    <h3 style="margin-top: 0; color: #4a90e2; font-size: 1.1em;">Debug Mode</h3>
+                    <div style="display: flex; align-items: center; gap: 15px; flex-wrap: wrap;">
+                        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                            <input type="checkbox" id="debug" name="debug" style="width: auto; cursor: pointer;">
+                            <span>Enable Debug Logging</span>
+                        </label>
+                        <button type="button" id="download-logs-btn" class="btn" style="background: #5dade2;">
+                            Download Logs
+                        </button>
+                    </div>
+                    <small style="color: #888; display: block; margin-top: 10px;">
+                        Enable verbose logs and diagnostic overlays for troubleshooting. Logs can be downloaded for analysis.
+                    </small>
+                </div>
+                
+                <!-- Scheduling Settings -->
+                <h3 style="color: #4a90e2; margin-top: 20px;">Scheduling</h3>
+                
                 <div class="form-group">
-                    <label>
-                        <input type="checkbox" id="debug" name="debug">
-                        Debug Mode
-                    </label>
+                    <label for="earliestTime">Daily Window - Earliest Time</label>
+                    <input type="time" id="earliestTime" name="earliestTime" value="09:00">
+                    <small style="color: #888; display: block; margin-top: 5px;">
+                        Start of daily voting window
+                    </small>
                 </div>
                 
                 <div class="form-group">
-                    <label for="timeout">Timeout (ms)</label>
+                    <label for="latestTime">Daily Window - Latest Time</label>
+                    <input type="time" id="latestTime" name="latestTime" value="21:00">
+                    <small style="color: #888; display: block; margin-top: 5px;">
+                        End of daily voting window
+                    </small>
+                </div>
+                
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" id="retryEnabled" name="retryEnabled" checked>
+                        Enable Same-Day Retries
+                    </label>
+                    <small style="color: #888; display: block; margin-top: 5px;">
+                        Retry failed votes later the same day
+                    </small>
+                </div>
+                
+                <div class="form-group">
+                    <label for="maxRetriesPerDay">Max Retries Per Day</label>
+                    <input type="number" id="maxRetriesPerDay" name="maxRetriesPerDay" value="3" min="1" max="10">
+                </div>
+                
+                <!-- Timeout Settings -->
+                <h3 style="color: #4a90e2; margin-top: 20px;">Timeouts</h3>
+                
+                <div class="form-group">
+                    <label for="timeout">Page Load Timeout (ms)</label>
                     <input type="number" id="timeout" name="timeout" value="5000">
                 </div>
                 
                 <div class="form-group">
-                    <label for="timeoutError">Error Retry Timeout (ms)</label>
+                    <label for="timeoutError">Error Retry Delay (ms)</label>
                     <input type="number" id="timeoutError" name="timeoutError" value="900000">
                 </div>
                 
@@ -330,6 +396,109 @@
     </div>
     
     <script>
+        // URL parsing for project setup
+        const URL_PATTERNS = {
+            'minecraft-server.eu': {
+                regex: /minecraft-server\.eu\/vote\/index\/([A-Z0-9]+)/i,
+                example: 'https://minecraft-server.eu/vote/index/208F7/'
+            },
+            'topcraft.club': {
+                regex: /topcraft\.club\/servers\/(\d+)/i,
+                example: 'https://topcraft.club/servers/10496/'
+            },
+            'mctop.su': {
+                regex: /mctop\.su\/servers\/(\d+)/i,
+                example: 'https://mctop.su/servers/5231/'
+            },
+            'mcrate.su': {
+                regex: /mcrate\.su\/(rate|project)\/(\d+)/i,
+                idIndex: 2,
+                example: 'http://mcrate.su/rate/4396'
+            },
+            'minecraftservers.org': {
+                regex: /minecraftservers\.org\/(vote|server)\/(\d+)/i,
+                idIndex: 2,
+                example: 'https://minecraftservers.org/vote/25531'
+            },
+            'planetminecraft.com': {
+                regex: /planetminecraft\.com\/server\/([^\/]+)/i,
+                example: 'https://www.planetminecraft.com/server/example-server/'
+            },
+            'topg.org': {
+                regex: /topg\.org\/minecraft\/(vote|server)\/(\d+)/i,
+                idIndex: 2,
+                example: 'https://topg.org/minecraft/vote/12345'
+            },
+            'minecraft-server.net': {
+                regex: /minecraft-server\.net\/(vote|server)\/([^\/]+)/i,
+                idIndex: 2,
+                example: 'https://minecraft-server.net/vote/example'
+            },
+            'minecraftlist.org': {
+                regex: /minecraftlist\.org\/(vote|server)\/([^\/]+)/i,
+                idIndex: 2,
+                example: 'https://minecraftlist.org/vote/example'
+            }
+        };
+        
+        function parseVoteURL(url) {
+            // Normalize URL
+            url = url.trim();
+            if (!url.startsWith('http://') && !url.startsWith('https://')) {
+                url = 'https://' + url;
+            }
+            
+            // Remove trailing slash
+            url = url.replace(/\/$/, '');
+            
+            // Try to match against each pattern
+            for (const [provider, pattern] of Object.entries(URL_PATTERNS)) {
+                const match = url.match(pattern.regex);
+                if (match) {
+                    const idIndex = pattern.idIndex || 1;
+                    return {
+                        provider: provider,
+                        projectId: match[idIndex],
+                        success: true
+                    };
+                }
+            }
+            
+            return {
+                success: false,
+                error: 'No project ID found in the pasted URL. Please paste a valid vote link.'
+            };
+        }
+        
+        // URL input handler
+        document.getElementById('vote-url').addEventListener('input', (e) => {
+            const url = e.target.value;
+            const errorDiv = document.getElementById('url-parse-error');
+            
+            if (!url || url.length < 10) {
+                errorDiv.style.display = 'none';
+                return;
+            }
+            
+            const result = parseVoteURL(url);
+            
+            if (result.success) {
+                // Auto-fill provider and project ID
+                document.getElementById('rating').value = result.provider;
+                document.getElementById('project-id').value = result.projectId;
+                errorDiv.style.display = 'none';
+                
+                // Visual feedback
+                e.target.style.borderColor = '#2ecc71';
+            } else {
+                // Show error
+                errorDiv.textContent = result.error + ' Examples: ' + 
+                    Object.values(URL_PATTERNS).slice(0, 3).map(p => p.example).join(', ');
+                errorDiv.style.display = 'block';
+                e.target.style.borderColor = '#e74c3c';
+            }
+        });
+        
         // Tab switching
         document.querySelectorAll('.tab').forEach(tab => {
             tab.addEventListener('click', () => {
@@ -445,10 +614,19 @@
                         document.getElementById('debug').checked = s.debug || false;
                         document.getElementById('timeout').value = s.timeout || 5000;
                         document.getElementById('timeoutError').value = s.timeoutError || 900000;
+                        document.getElementById('earliestTime').value = s.earliestTime || '09:00';
+                        document.getElementById('latestTime').value = s.latestTime || '21:00';
+                        document.getElementById('retryEnabled').checked = s.retryEnabled !== false;
+                        document.getElementById('maxRetriesPerDay').value = s.maxRetriesPerDay || 3;
                     }
                 })
                 .catch(err => showNotification('Error loading settings: ' + err, true));
         }
+        
+        // Download logs button
+        document.getElementById('download-logs-btn').addEventListener('click', () => {
+            window.location.href = '/api/logs/download';
+        });
         
         // Save settings
         document.getElementById('settings-form').addEventListener('submit', (e) => {
@@ -456,7 +634,11 @@
             const data = {
                 debug: document.getElementById('debug').checked,
                 timeout: parseInt(document.getElementById('timeout').value),
-                timeoutError: parseInt(document.getElementById('timeoutError').value)
+                timeoutError: parseInt(document.getElementById('timeoutError').value),
+                earliestTime: document.getElementById('earliestTime').value,
+                latestTime: document.getElementById('latestTime').value,
+                retryEnabled: document.getElementById('retryEnabled').checked,
+                maxRetriesPerDay: parseInt(document.getElementById('maxRetriesPerDay').value)
             };
             
             fetch('/api/settings', {

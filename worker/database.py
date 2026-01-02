@@ -52,7 +52,14 @@ class Database:
                 'timeout': 5000,
                 'timeoutError': 900000,
                 'timeoutVote': 900000,
-                'debug': False
+                'debug': False,
+                # New scheduling settings
+                'earliestTime': '09:00',
+                'latestTime': '21:00',
+                'retryEnabled': True,
+                'maxRetriesPerDay': 3,
+                'retryMinDelayMinutes': 30,
+                'retryMaxDelayMinutes': 180
             }
             self._save_settings()
         
@@ -174,6 +181,18 @@ class Database:
                 'lastAttemptVote': None,
                 'added': int(datetime.now().timestamp() * 1000)
             }
+        
+        # Initialize retry tracking fields
+        if 'lastAttemptAt' not in project:
+            project['lastAttemptAt'] = None
+        if 'lastSuccessAt' not in project:
+            project['lastSuccessAt'] = None
+        if 'nextAttemptAt' not in project:
+            project['nextAttemptAt'] = None
+        if 'retriesTodayCount' not in project:
+            project['retriesTodayCount'] = 0
+        if 'lastError' not in project:
+            project['lastError'] = None
         
         self._projects[key] = project
         self._save_projects()

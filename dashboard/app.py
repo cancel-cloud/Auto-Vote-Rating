@@ -178,6 +178,21 @@ def restart_project(key):
         return jsonify({'success': False, 'error': str(e)}), 500
 
 
+@app.route('/api/logs/download', methods=['GET'])
+def download_logs():
+    """Download worker logs"""
+    try:
+        log_file = os.path.join(config.data_dir, 'worker.log')
+        if os.path.exists(log_file):
+            from flask import send_file
+            return send_file(log_file, as_attachment=True, download_name='worker.log')
+        else:
+            return jsonify({'success': False, 'error': 'Log file not found'}), 404
+    except Exception as e:
+        logger.error(f"Error downloading logs: {e}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
 # Serve static files (CSS, JS, images)
 @app.route('/css/<path:filename>')
 def serve_css(filename):

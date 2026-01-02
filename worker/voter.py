@@ -31,7 +31,9 @@ class Voter:
     
     def vote(self, project: Dict) -> Dict:
         """
-        Execute voting for a project.
+        Execute voting for a project - REMINDER MODE.
+        Opens the vote page and notifies user to complete manually.
+        NO AUTOMATIC FORM SUBMISSION OR CLICKING.
         Returns a dict with 'success' boolean and optional 'error' message.
         """
         try:
@@ -39,11 +41,7 @@ class Voter:
             
             rating = project.get('rating')
             
-            # For now, we'll implement a basic voting mechanism
-            # The actual implementation would need to parse the JavaScript voting scripts
-            # and convert them to Python/Playwright equivalents
-            
-            logger.info(f"Attempting to vote for {rating} project")
+            logger.info(f"Opening vote page for {rating} project (REMINDER MODE - user action required)")
             
             # Create a new page
             context = self.browser.new_context()
@@ -64,21 +62,23 @@ class Voter:
                 # Wait a bit for the page to load
                 page.wait_for_timeout(2000)
                 
-                # Try to find and click the vote button
-                # This is a simplified version - each site has different selectors
-                success = self._attempt_vote(page, project)
+                # Log that page was opened successfully
+                logger.info(f"✓ Vote page opened for {rating} - USER MUST COMPLETE VOTE MANUALLY")
                 
-                if success:
-                    logger.info(f"Successfully voted for {rating}")
-                    return {'success': True}
-                else:
-                    return {'success': False, 'error': 'Could not find vote button or already voted'}
+                # Keep page open for a while so user can see it
+                page.wait_for_timeout(5000)
+                
+                # Return success - page was opened
+                return {
+                    'success': True,
+                    'message': 'Vote page opened - please complete vote manually'
+                }
                     
             except PlaywrightTimeout:
-                logger.error(f"Timeout while voting for {rating}")
+                logger.error(f"Timeout while opening vote page for {rating}")
                 return {'success': False, 'error': 'Page timeout'}
             except Exception as e:
-                logger.error(f"Error during voting: {e}", exc_info=True)
+                logger.error(f"Error during page opening: {e}", exc_info=True)
                 return {'success': False, 'error': str(e)}
             finally:
                 page.close()
@@ -93,16 +93,19 @@ class Voter:
         rating = project.get('rating')
         project_id = project.get('id')
         
-        # Load project definitions from projects.js equivalent
+        # Load project definitions
         # For now, we'll construct URLs based on common patterns
         
         url_patterns = {
+            'minecraft-server.eu': f'https://minecraft-server.eu/vote/index/{project_id}',
             'topcraft.club': f'https://topcraft.club/servers/{project_id}/vote/',
             'mctop.su': f'https://mctop.su/servers/{project_id}/vote/',
             'mcrate.su': f'http://mcrate.su/rate/{project_id}',
             'minecraftservers.org': f'https://minecraftservers.org/vote/{project_id}',
             'planetminecraft.com': f'https://www.planetminecraft.com/server/{project_id}/',
             'topg.org': f'https://topg.org/minecraft/vote/{project_id}',
+            'minecraft-server.net': f'https://minecraft-server.net/vote/{project_id}',
+            'minecraftlist.org': f'https://minecraftlist.org/vote/{project_id}',
         }
         
         # Use custom URL if provided
