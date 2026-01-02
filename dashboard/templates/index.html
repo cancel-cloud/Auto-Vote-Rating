@@ -7,216 +7,334 @@
     <link rel="stylesheet" href="/css/reset.css">
     <link rel="stylesheet" href="/css/main.css">
     <style>
+        :root {
+            color-scheme: dark;
+        }
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-            background: #1a1a1a;
+            background: #121212;
             color: #e0e0e0;
             margin: 0;
             padding: 0;
         }
-        
         .container {
             max-width: 1200px;
             margin: 0 auto;
-            padding: 20px;
+            padding: 24px;
         }
-        
         .header {
-            background: #2d2d2d;
-            padding: 20px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            text-align: center;
+            background: #1f1f1f;
+            padding: 24px;
+            border-radius: 12px;
+            margin-bottom: 24px;
+            border: 1px solid #2a2a2a;
         }
-        
         .header h1 {
-            margin: 0;
+            margin: 0 0 8px;
             color: #4a90e2;
-            font-size: 2em;
         }
-        
         .tabs {
             display: flex;
             gap: 10px;
-            margin-bottom: 20px;
-            border-bottom: 2px solid #3d3d3d;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
         }
-        
         .tab {
-            padding: 10px 20px;
-            background: #2d2d2d;
             border: none;
-            color: #e0e0e0;
+            border-radius: 999px;
+            padding: 10px 18px;
+            background: #1f1f1f;
+            color: #d0d0d0;
             cursor: pointer;
-            border-radius: 8px 8px 0 0;
-            transition: background 0.3s;
+            border: 1px solid transparent;
+            transition: background 0.2s, color 0.2s, border 0.2s;
         }
-        
-        .tab:hover {
-            background: #3d3d3d;
-        }
-        
         .tab.active {
             background: #4a90e2;
-            color: white;
+            color: #fff;
+            border-color: #5dade2;
         }
-        
         .tab-content {
             display: none;
-            background: #2d2d2d;
-            padding: 20px;
-            border-radius: 8px;
+            background: #1f1f1f;
+            border: 1px solid #2a2a2a;
+            border-radius: 12px;
+            padding: 24px;
         }
-        
         .tab-content.active {
             display: block;
         }
-        
+        .projects-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+        .projects-header h2 {
+            margin: 0;
+        }
         .project-list {
             display: grid;
-            gap: 15px;
+            gap: 16px;
         }
-        
         .project-card {
-            background: #3d3d3d;
-            padding: 15px;
-            border-radius: 8px;
-            border-left: 4px solid #4a90e2;
+            background: #262626;
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid #303030;
+            position: relative;
         }
-        
-        .project-card.error {
-            border-left-color: #e74c3c;
+        .project-card.active {
+            border-color: #4a90e2;
         }
-        
         .project-card h3 {
-            margin: 0 0 10px 0;
-            color: #4a90e2;
+            margin: 0;
+            font-size: 1.1rem;
         }
-        
-        .project-info {
+        .project-meta {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 10px;
-            margin: 10px 0;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 12px;
+            margin: 16px 0;
         }
-        
-        .project-info div {
-            font-size: 0.9em;
+        .project-meta div {
+            font-size: 0.9rem;
+            color: #b0b0b0;
         }
-        
         .project-actions {
             display: flex;
             gap: 10px;
-            margin-top: 10px;
+            flex-wrap: wrap;
         }
-        
         .btn {
             padding: 8px 16px;
             background: #4a90e2;
-            color: white;
+            color: #fff;
             border: none;
-            border-radius: 4px;
+            border-radius: 6px;
             cursor: pointer;
-            transition: background 0.3s;
+            transition: opacity 0.2s, transform 0.2s;
         }
-        
-        .btn:hover {
-            background: #357abd;
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
         }
-        
+        .btn-secondary {
+            background: #3a3a3a;
+        }
         .btn-danger {
             background: #e74c3c;
         }
-        
-        .btn-danger:hover {
-            background: #c0392b;
+        .status-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 10px;
+            border-radius: 999px;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
         }
-        
-        .form-group {
-            margin-bottom: 15px;
+        .status-IDLE { background: #2f2f2f; color: #a0a0a0; }
+        .status-SCHEDULED { background: #1d3a56; color: #5dade2; }
+        .status-DUE_SOON { background: #4a361b; color: #f0b97a; }
+        .status-QUEUED { background: #33265c; color: #b39ddb; }
+        .status-IN_PROGRESS { background: #1f3c2c; color: #58d68d; }
+        .status-NEEDS_USER_ACTION { background: #5c2b2b; color: #ffb3b3; }
+        .status-SUCCESS { background: #224a2a; color: #a3e4b8; }
+        .status-FAILED { background: #5c1f1f; color: #f25f5c; }
+        .timeline {
+            margin-top: 14px;
+            border-top: 1px solid #333;
+            padding-top: 12px;
         }
-        
-        .form-group label {
-            display: block;
-            margin-bottom: 5px;
+        .timeline h4 {
+            margin: 0 0 8px;
+            font-size: 0.95rem;
             color: #b0b0b0;
         }
-        
+        .timeline ul {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            max-height: 220px;
+            overflow-y: auto;
+        }
+        .timeline li {
+            font-size: 0.85rem;
+            padding: 6px 0;
+            border-bottom: 1px solid #2f2f2f;
+        }
+        .timeline li:last-child {
+            border-bottom: none;
+        }
+        .timeline .ts {
+            color: #7d7d7d;
+            font-size: 0.75rem;
+            display: block;
+        }
+        .form-group {
+            margin-bottom: 16px;
+        }
+        .form-group label {
+            display: flex;
+            font-weight: 600;
+            margin-bottom: 6px;
+            color: #c7c7c7;
+        }
         .form-group input,
         .form-group select,
         .form-group textarea {
             width: 100%;
-            padding: 10px;
-            background: #3d3d3d;
-            border: 1px solid #4d4d4d;
-            border-radius: 4px;
-            color: #e0e0e0;
-            box-sizing: border-box;
-        }
-        
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 15px;
-        }
-        
-        .stat-card {
-            background: #3d3d3d;
-            padding: 20px;
+            padding: 10px 12px;
             border-radius: 8px;
-            text-align: center;
+            border: 1px solid #3a3a3a;
+            background: #1b1b1b;
+            color: #e0e0e0;
         }
-        
-        .stat-card h3 {
-            margin: 0 0 10px 0;
-            color: #4a90e2;
-            font-size: 1.2em;
+        .helper-text {
+            font-size: 0.85rem;
+            color: #8f8f8f;
+            margin-top: 4px;
+            display: block;
         }
-        
-        .stat-card .value {
-            font-size: 2em;
-            font-weight: bold;
-            color: #5dade2;
-        }
-        
-        .notification {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            padding: 15px 20px;
-            background: #2ecc71;
-            color: white;
-            border-radius: 4px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
-            z-index: 1000;
-            animation: slideIn 0.3s ease-out;
-        }
-        
-        .notification.error {
-            background: #e74c3c;
-        }
-        
-        @keyframes slideIn {
-            from {
-                transform: translateX(400px);
-                opacity: 0;
-            }
-            to {
-                transform: translateX(0);
-                opacity: 1;
-            }
-        }
-        
         .empty-state {
             text-align: center;
             padding: 60px 20px;
             color: #888;
         }
-        
-        .empty-state img {
-            width: 100px;
-            opacity: 0.3;
-            margin-bottom: 20px;
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 14px 20px;
+            background: #2ecc71;
+            color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            z-index: 1000;
+            animation: fadeIn 0.2s ease-out;
+        }
+        .notification.error {
+            background: #e74c3c;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .countdown {
+            font-weight: 600;
+            color: #f0b97a;
+        }
+        .project-card .spinner {
+            width: 14px;
+            height: 14px;
+            border: 2px solid rgba(255,255,255,0.2);
+            border-top-color: #fff;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        .projects-toolbar {
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            flex-wrap: wrap;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+        .debug-panels {
+            margin-top: 24px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 16px;
+        }
+        .panel {
+            background: #262626;
+            border: 1px solid #303030;
+            border-radius: 12px;
+            padding: 16px;
+        }
+        .panel h3 {
+            margin: 0 0 12px;
+        }
+        .storage-items {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .storage-items li {
+            padding: 6px 0;
+            border-bottom: 1px solid #333;
+            font-size: 0.9rem;
+        }
+        .storage-items li:last-child {
+            border-bottom: none;
+        }
+        .logs-list {
+            max-height: 260px;
+            overflow-y: auto;
+            font-family: "SFMono-Regular", Consolas, monospace;
+            font-size: 0.85rem;
+            background: #1a1a1a;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid #2a2a2a;
+        }
+        .log-entry {
+            margin-bottom: 10px;
+            border-bottom: 1px solid #2a2a2a;
+            padding-bottom: 8px;
+        }
+        .log-entry:last-child {
+            border-bottom: none;
+        }
+        .log-entry strong {
+            color: #5dade2;
+        }
+        .project-card .working-overlay {
+            position: absolute;
+            inset: 0;
+            border-radius: 12px;
+            background: rgba(0,0,0,0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            pointer-events: none;
+        }
+        .advanced-toggle {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9rem;
+            color: #b0b0b0;
+            margin-top: 6px;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 16px;
+            margin-top: 16px;
+        }
+        .stat-card {
+            background: #262626;
+            border: 1px solid #303030;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+        }
+        .stat-card h3 {
+            margin: 0 0 10px;
+            color: #b0b0b0;
+        }
+        .stat-card .value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #5dade2;
         }
     </style>
 </head>
@@ -224,196 +342,161 @@
     <div class="container">
         <div class="header">
             <h1>🎮 Auto Vote Rating</h1>
-            <p>Self-hosted voting automation dashboard</p>
+            <p>Vote reminder & assistant mode (no automatic submissions). Paste a vote URL, track status, and let the worker open the page while you confirm the vote.</p>
         </div>
-        
+
         <div class="tabs">
             <button class="tab active" data-tab="projects">Projects</button>
             <button class="tab" data-tab="add-project">Add Project</button>
             <button class="tab" data-tab="settings">Settings</button>
             <button class="tab" data-tab="statistics">Statistics</button>
         </div>
-        
-        <!-- Projects Tab -->
+
         <div id="projects" class="tab-content active">
-            <h2>Your Projects</h2>
+            <div class="projects-toolbar">
+                <div>
+                    <h2>Your Projects</h2>
+                    <small id="project-summary" class="helper-text"></small>
+                </div>
+                <button class="btn btn-secondary" onclick="switchToTab('add-project')">+ Add Project</button>
+            </div>
             <div id="project-list" class="project-list">
                 <div class="empty-state">
                     <p>Loading projects...</p>
                 </div>
             </div>
+
+            <div id="debug-panels" class="debug-panels" style="display:none;">
+                <div class="panel">
+                    <h3>Storage Health</h3>
+                    <ul class="storage-items" id="storage-health">
+                        <li>Loading...</li>
+                    </ul>
+                </div>
+                <div class="panel">
+                    <h3>Debug Logs</h3>
+                    <div style="display:flex; gap:10px; align-items:center; margin-bottom:10px;">
+                        <select id="log-project-filter" style="flex:1; padding:6px 10px; border-radius:6px; background:#1b1b1b; color:#e0e0e0; border:1px solid #333;">
+                            <option value="">All projects</option>
+                        </select>
+                        <button class="btn btn-secondary" id="refresh-logs-btn">Refresh</button>
+                    </div>
+                    <div class="logs-list" id="logs-list">
+                        <div>Loading logs...</div>
+                    </div>
+                </div>
+            </div>
         </div>
-        
-        <!-- Add Project Tab -->
+
         <div id="add-project" class="tab-content">
             <h2>Add New Project</h2>
             <form id="add-project-form">
                 <div class="form-group">
-                    <label for="vote-url">Vote Link URL *</label>
-                    <input type="text" id="vote-url" placeholder="Paste your vote link here (e.g., https://minecraft-server.eu/vote/index/208F7/)">
-                    <small style="color: #888; display: block; margin-top: 5px;">
-                        Paste a vote URL and we'll auto-detect the site and project ID
-                    </small>
+                    <label for="vote-url">Vote URL *</label>
+                    <input type="text" id="vote-url" name="voteUrl" placeholder="Paste a vote URL (e.g., https://minecraft-server.eu/vote/index/208F7/)">
+                    <span class="helper-text">We detect the site + project automatically. Enable advanced overrides only if the URL cannot be parsed.</span>
+                    <div id="url-parse-error" style="display:none; color:#ff7675; padding:10px; background:#3d1f1f; border-radius:6px; margin-top:8px;"></div>
                 </div>
-                
+                <div class="advanced-toggle">
+                    <label><input type="checkbox" id="manual-override"> Enable manual override</label>
+                </div>
                 <div class="form-group">
-                    <label for="rating">Rating Site *</label>
-                    <select id="rating" name="rating" required>
-                        <option value="">Select a site...</option>
-                        <option value="minecraft-server.eu">minecraft-server.eu</option>
-                        <option value="minecraft-serverlist.net">minecraft-serverlist.net</option>
-                        <option value="topcraft.club">topcraft.club</option>
-                        <option value="mctop.su">mctop.su</option>
-                        <option value="mcrate.su">mcrate.su</option>
-                        <option value="minecraftrating.ru">minecraftrating.ru</option>
-                        <option value="monitoringminecraft.ru">monitoringminecraft.ru</option>
-                        <option value="ionmc.top">ionmc.top</option>
-                        <option value="minecraftservers.org">minecraftservers.org</option>
-                        <option value="serveur-prive.net">serveur-prive.net</option>
-                        <option value="planetminecraft.com">planetminecraft.com</option>
-                        <option value="topg.org">topg.org</option>
-                        <option value="minecraft-mp.com">minecraft-mp.com</option>
-                        <option value="minecraft-server-list.com">minecraft-server-list.com</option>
-                        <option value="serverpact.com">serverpact.com</option>
-                        <option value="minecraftiplist.com">minecraftiplist.com</option>
-                        <option value="topminecraftservers.org">topminecraftservers.org</option>
-                        <option value="minecraftservers.biz">minecraftservers.biz</option>
-                        <option value="hotmc.ru">hotmc.ru</option>
-                        <option value="minecraft-server.net">minecraft-server.net</option>
-                        <option value="top-games.net">top-games.net</option>
-                        <option value="tmonitoring.com">tmonitoring.com</option>
-                        <option value="top.gg">top.gg</option>
-                        <option value="discordbotlist.com">discordbotlist.com</option>
-                        <option value="discords.com">discords.com</option>
-                        <option value="mmotop.ru">mmotop.ru</option>
-                        <option value="mc-servers.com">mc-servers.com</option>
-                        <option value="minecraftlist.org">minecraftlist.org</option>
-                        <option value="minecraft-index.com">minecraft-index.com</option>
-                        <option value="serverlist101.com">serverlist101.com</option>
-                        <option value="mcserver-list.eu">mcserver-list.eu</option>
-                        <option value="craftlist.org">craftlist.org</option>
-                        <option value="czech-craft.eu">czech-craft.eu</option>
-                        <option value="minecraft.buzz">minecraft.buzz</option>
-                        <option value="minecraftservery.eu">minecraftservery.eu</option>
-                        <option value="rpg-paradize.com">rpg-paradize.com</option>
-                        <option value="minecraftkrant.nl">minecraftkrant.nl</option>
-                        <option value="trackyserver.com">trackyserver.com</option>
-                        <option value="mc-lists.org">mc-lists.org</option>
-                        <option value="topmcservers.com">topmcservers.com</option>
-                        <option value="bestservers.com">bestservers.com</option>
-                        <option value="craft-list.net">craft-list.net</option>
-                        <option value="minecraft-servers-list.org">minecraft-servers-list.org</option>
-                        <option value="serverliste.net">serverliste.net</option>
-                        <option value="gtop100.com">gtop100.com</option>
-                        <option value="wargm.ru">wargm.ru</option>
-                        <option value="minestatus.net">minestatus.net</option>
-                        <option value="misterlauncher.org">misterlauncher.org</option>
+                    <label for="rating">Vote Site (detected)</label>
+                    <select id="rating" name="rating" disabled>
+                        <option value="">Loading sites...</option>
                     </select>
-                    <small style="color: #888; display: block; margin-top: 5px;">
-                        Auto-filled from URL or select manually
-                    </small>
                 </div>
-                
                 <div class="form-group">
                     <label for="project-id">Project ID *</label>
-                    <input type="text" id="project-id" name="id" placeholder="Enter or auto-filled from URL" required>
-                    <small style="color: #888; display: block; margin-top: 5px;">
-                        Auto-filled from URL or enter manually
-                    </small>
+                    <input type="text" id="project-id" name="id" placeholder="Auto-filled from URL" disabled>
                 </div>
-                
                 <div class="form-group">
-                    <label for="nick">Nickname (optional)</label>
-                    <input type="text" id="nick" name="nick" placeholder="Your Minecraft nickname">
+                    <label for="nick">Minecraft Nickname (optional)</label>
+                    <input type="text" id="nick" name="nick" placeholder="Used when voting">
                 </div>
-                
                 <div class="form-group">
                     <label for="name">Project Name (optional)</label>
-                    <input type="text" id="name" name="name" placeholder="Project display name">
+                    <input type="text" id="name" name="name" placeholder="Friendly name shown in dashboard">
                 </div>
-                
-                <div id="url-parse-error" style="display:none; color:#e74c3c; padding:10px; background:#3d1f1f; border-radius:4px; margin:10px 0;"></div>
-                
                 <button type="submit" class="btn">Add Project</button>
             </form>
+            <div style="margin-top:24px;">
+                <h3>Supported Sites</h3>
+                <div id="supported-sites" class="helper-text">Loading...</div>
+            </div>
         </div>
-        
-        <!-- Settings Tab -->
+
         <div id="settings" class="tab-content">
             <h2>Settings</h2>
             <form id="settings-form">
-                <!-- Debug Mode Section - Grouped -->
-                <div class="form-group" style="border: 1px solid #4d4d4d; padding: 15px; border-radius: 8px; background: #3d3d3d;">
-                    <h3 style="margin-top: 0; color: #4a90e2; font-size: 1.1em;">Debug Mode</h3>
-                    <div style="display: flex; align-items: center; gap: 15px; flex-wrap: wrap;">
-                        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
-                            <input type="checkbox" id="debug" name="debug" style="width: auto; cursor: pointer;">
-                            <span>Enable Debug Logging</span>
+                <div class="form-group" style="border:1px solid #333; padding:16px; border-radius:12px; background:#1b1b1b;">
+                    <div style="display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap;">
+                        <div>
+                            <h3 style="margin:0;">Debug Mode</h3>
+                            <span class="helper-text">Enables verbose UI panels, status timelines, and worker logs.</span>
+                        </div>
+                        <label style="display:flex; align-items:center; gap:8px;">
+                            <input type="checkbox" id="debug" name="debug">
+                            <span>Enable Debugging</span>
                         </label>
-                        <button type="button" id="download-logs-btn" class="btn" style="background: #5dade2;">
-                            Download Logs
-                        </button>
                     </div>
-                    <small style="color: #888; display: block; margin-top: 10px;">
-                        Enable verbose logs and diagnostic overlays for troubleshooting. Logs can be downloaded for analysis.
-                    </small>
+                    <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:12px;">
+                        <button type="button" id="download-worker-log" class="btn btn-secondary">Download Worker Log</button>
+                        <button type="button" id="download-debug-log" class="btn btn-secondary">Download Debug Log</button>
+                    </div>
                 </div>
-                
-                <!-- Scheduling Settings -->
-                <h3 style="color: #4a90e2; margin-top: 20px;">Scheduling</h3>
-                
+
+                <h3 style="margin-top:20px;">Scheduling</h3>
                 <div class="form-group">
-                    <label for="earliestTime">Daily Window - Earliest Time</label>
-                    <input type="time" id="earliestTime" name="earliestTime" value="09:00">
-                    <small style="color: #888; display: block; margin-top: 5px;">
-                        Start of daily voting window
-                    </small>
+                    <label for="dailyWindowStart">Daily Window Start</label>
+                    <input type="time" id="dailyWindowStart" name="dailyWindowStart">
+                    <span class="helper-text">First possible attempt each day (local time).</span>
                 </div>
-                
                 <div class="form-group">
-                    <label for="latestTime">Daily Window - Latest Time</label>
-                    <input type="time" id="latestTime" name="latestTime" value="21:00">
-                    <small style="color: #888; display: block; margin-top: 5px;">
-                        End of daily voting window
-                    </small>
+                    <label for="dailyWindowEnd">Daily Window End</label>
+                    <input type="time" id="dailyWindowEnd" name="dailyWindowEnd">
+                    <span class="helper-text">Last possible attempt each day.</span>
                 </div>
-                
                 <div class="form-group">
-                    <label>
-                        <input type="checkbox" id="retryEnabled" name="retryEnabled" checked>
-                        Enable Same-Day Retries
-                    </label>
-                    <small style="color: #888; display: block; margin-top: 5px;">
-                        Retry failed votes later the same day
-                    </small>
+                    <label for="jitterMinutes">Window Jitter (minutes)</label>
+                    <input type="number" id="jitterMinutes" name="jitterMinutes" min="0" value="25">
+                    <span class="helper-text">Randomizes attempt time within ±jitter minutes.</span>
                 </div>
-                
+                <div class="form-group">
+                    <label for="retryBackoffMinutes">Retry Backoff (minutes)</label>
+                    <input type="number" id="retryBackoffMinutes" min="1" value="45">
+                    <span class="helper-text">Base delay before retrying the same day.</span>
+                </div>
+                <div class="form-group">
+                    <label for="retryJitterMinutes">Retry Jitter (minutes)</label>
+                    <input type="number" id="retryJitterMinutes" min="0" value="10">
+                </div>
+                <div class="form-group">
+                    <label for="retryWindowEnd">Retry Window End</label>
+                    <input type="time" id="retryWindowEnd" name="retryWindowEnd">
+                </div>
                 <div class="form-group">
                     <label for="maxRetriesPerDay">Max Retries Per Day</label>
-                    <input type="number" id="maxRetriesPerDay" name="maxRetriesPerDay" value="3" min="1" max="10">
+                    <input type="number" id="maxRetriesPerDay" min="0" value="3">
                 </div>
-                
-                <!-- Timeout Settings -->
-                <h3 style="color: #4a90e2; margin-top: 20px;">Timeouts</h3>
-                
+
+                <h3 style="margin-top:20px;">Timeouts</h3>
                 <div class="form-group">
                     <label for="timeout">Page Load Timeout (ms)</label>
                     <input type="number" id="timeout" name="timeout" value="5000">
                 </div>
-                
                 <div class="form-group">
                     <label for="timeoutError">Error Retry Delay (ms)</label>
                     <input type="number" id="timeoutError" name="timeoutError" value="900000">
                 </div>
-                
+
                 <button type="submit" class="btn">Save Settings</button>
             </form>
         </div>
-        
-        <!-- Statistics Tab -->
+
         <div id="statistics" class="tab-content">
             <h2>Statistics</h2>
-            <div id="stats-grid" class="stats-grid">
+            <div class="stats-grid" id="stats-grid">
                 <div class="stat-card">
                     <h3>Total Successful Votes</h3>
                     <div class="value" id="total-success">0</div>
@@ -433,471 +516,499 @@
             </div>
         </div>
     </div>
-    
+
     <script>
-        // URL parsing for project setup - All supported voting sites
-        const URL_PATTERNS = {
-            'minecraft-server.eu': {
-                regex: /minecraft-server\.eu\/vote\/index\/([A-Z0-9]+)/i,
-                example: 'https://minecraft-server.eu/vote/index/208F7/'
-            },
-            'minecraft-serverlist.net': {
-                regex: /minecraft-serverlist\.net\/vote\/(\d+)/i,
-                example: 'https://www.minecraft-serverlist.net/vote/51076/'
-            },
-            'topcraft.club': {
-                regex: /topcraft\.(club|ru)\/servers\/(\d+)/i,
-                idIndex: 2,
-                example: 'https://topcraft.club/servers/10496/'
-            },
-            'mctop.su': {
-                regex: /mctop\.su\/servers\/(\d+)/i,
-                example: 'https://mctop.su/servers/5231/'
-            },
-            'mcrate.su': {
-                regex: /mcrate\.su\/(rate|project)\/(\d+)/i,
-                idIndex: 2,
-                example: 'http://mcrate.su/rate/4396'
-            },
-            'minecraftrating.ru': {
-                regex: /minecraftrating\.ru\/(projects|vote)\/([^\/]+)/i,
-                idIndex: 2,
-                example: 'https://minecraftrating.ru/projects/example/'
-            },
-            'monitoringminecraft.ru': {
-                regex: /monitoringminecraft\.ru\/top\/([^\/]+)/i,
-                example: 'https://monitoringminecraft.ru/top/example/'
-            },
-            'ionmc.top': {
-                regex: /ionmc\.top\/projects\/(\d+)/i,
-                example: 'https://ionmc.top/projects/80/'
-            },
-            'minecraftservers.org': {
-                regex: /minecraftservers\.org\/(vote|server)\/(\d+)/i,
-                idIndex: 2,
-                example: 'https://minecraftservers.org/vote/25531'
-            },
-            'serveur-prive.net': {
-                regex: /serveur-prive\.net\/.*?\/([^\/]+)\/vote/i,
-                example: 'https://serveur-prive.net/minecraft/example/vote'
-            },
-            'planetminecraft.com': {
-                regex: /planetminecraft\.com\/server\/([^\/]+)/i,
-                example: 'https://www.planetminecraft.com/server/example-server/'
-            },
-            'topg.org': {
-                regex: /topg\.org\/minecraft\/(vote|server)\/(\d+)/i,
-                idIndex: 2,
-                example: 'https://topg.org/minecraft/vote/12345'
-            },
-            'minecraft-mp.com': {
-                regex: /minecraft-mp\.com\/(vote|server)\/([^\/]+)/i,
-                idIndex: 2,
-                example: 'https://minecraft-mp.com/vote/example'
-            },
-            'minecraft-server-list.com': {
-                regex: /minecraft-server-list\.com\/(vote|server)\/([^\/]+)/i,
-                idIndex: 2,
-                example: 'https://minecraft-server-list.com/vote/example'
-            },
-            'serverpact.com': {
-                regex: /serverpact\.com\/.*?\/([^\/]+)/i,
-                example: 'https://serverpact.com/server/example'
-            },
-            'minecraftiplist.com': {
-                regex: /minecraftiplist\.com\/.*?\/([^\/]+)/i,
-                example: 'https://minecraftiplist.com/server/example'
-            },
-            'topminecraftservers.org': {
-                regex: /topminecraftservers\.org\/(vote|server)\/(\d+)/i,
-                idIndex: 2,
-                example: 'https://topminecraftservers.org/vote/12345'
-            },
-            'minecraftservers.biz': {
-                regex: /minecraftservers\.biz\/(vote|server)\/([^\/]+)/i,
-                idIndex: 2,
-                example: 'https://minecraftservers.biz/vote/example'
-            },
-            'hotmc.ru': {
-                regex: /hotmc\.ru\/.*?\/([^\/]+)/i,
-                example: 'https://hotmc.ru/server/example'
-            },
-            'minecraft-server.net': {
-                regex: /minecraft-server\.net\/(vote|server)\/([^\/]+)/i,
-                idIndex: 2,
-                example: 'https://minecraft-server.net/vote/example'
-            },
-            'top-games.net': {
-                regex: /top-(games|serveurs)\.net\/.*?\/([^\/]+)/i,
-                idIndex: 2,
-                example: 'https://top-games.net/minecraft/example'
-            },
-            'tmonitoring.com': {
-                regex: /tmonitoring\.com\/.*?\/([^\/]+)/i,
-                example: 'https://tmonitoring.com/server/example'
-            },
-            'top.gg': {
-                regex: /top\.gg\/(bot|server)\/(\d+)/i,
-                idIndex: 2,
-                example: 'https://top.gg/bot/123456'
-            },
-            'discordbotlist.com': {
-                regex: /discordbotlist\.com\/bots\/([^\/]+)/i,
-                example: 'https://discordbotlist.com/bots/example'
-            },
-            'discords.com': {
-                regex: /discords\.com\/(bots|servers)\/([^\/]+)/i,
-                idIndex: 2,
-                example: 'https://discords.com/bots/example'
-            },
-            'mmotop.ru': {
-                regex: /mmotop\.ru\/.*?\/([^\/]+)/i,
-                example: 'https://mmotop.ru/server/example'
-            },
-            'mc-servers.com': {
-                regex: /mc-servers\.com\/(vote|server)\/([^\/]+)/i,
-                idIndex: 2,
-                example: 'https://mc-servers.com/vote/example'
-            },
-            'minecraftlist.org': {
-                regex: /minecraftlist\.org\/(vote|server)\/([^\/]+)/i,
-                idIndex: 2,
-                example: 'https://minecraftlist.org/vote/example'
-            },
-            'minecraft-index.com': {
-                regex: /minecraft-index\.com\/(vote|server)\/([^\/]+)/i,
-                idIndex: 2,
-                example: 'https://minecraft-index.com/vote/example'
-            },
-            'serverlist101.com': {
-                regex: /serverlist101\.com\/.*?\/([^\/]+)/i,
-                example: 'https://serverlist101.com/server/example'
-            },
-            'mcserver-list.eu': {
-                regex: /mcserver-list\.eu\/.*?\/([^\/]+)/i,
-                example: 'https://mcserver-list.eu/server/example'
-            },
-            'craftlist.org': {
-                regex: /craftlist\.org\/.*?\/([^\/]+)/i,
-                example: 'https://craftlist.org/server/example'
-            },
-            'czech-craft.eu': {
-                regex: /czech-craft\.eu\/.*?\/([^\/]+)/i,
-                example: 'https://czech-craft.eu/server/example'
-            },
-            'minecraft.buzz': {
-                regex: /minecraft\.buzz\/.*?\/([^\/]+)/i,
-                example: 'https://minecraft.buzz/server/example'
-            },
-            'minecraftservery.eu': {
-                regex: /minecraftservery\.eu\/.*?\/([^\/]+)/i,
-                example: 'https://minecraftservery.eu/server/example'
-            },
-            'rpg-paradize.com': {
-                regex: /rpg-paradize\.com\/.*?\/([^\/]+)/i,
-                example: 'https://rpg-paradize.com/server/example'
-            },
-            'minecraftkrant.nl': {
-                regex: /minecraftkrant\.nl\/.*?\/([^\/]+)/i,
-                example: 'https://minecraftkrant.nl/server/example'
-            },
-            'trackyserver.com': {
-                regex: /trackyserver\.com\/.*?\/([^\/]+)/i,
-                example: 'https://trackyserver.com/server/example'
-            },
-            'mc-lists.org': {
-                regex: /mc-lists\.org\/.*?\/([^\/]+)/i,
-                example: 'https://mc-lists.org/server/example'
-            },
-            'topmcservers.com': {
-                regex: /topmcservers\.com\/.*?\/([^\/]+)/i,
-                example: 'https://topmcservers.com/server/example'
-            },
-            'bestservers.com': {
-                regex: /bestservers\.com\/.*?\/([^\/]+)/i,
-                example: 'https://bestservers.com/server/example'
-            },
-            'craft-list.net': {
-                regex: /craft-list\.net\/.*?\/([^\/]+)/i,
-                example: 'https://craft-list.net/server/example'
-            },
-            'minecraft-servers-list.org': {
-                regex: /minecraft-servers-list\.org\/.*?\/([^\/]+)/i,
-                example: 'https://minecraft-servers-list.org/server/example'
-            },
-            'serverliste.net': {
-                regex: /serverliste\.net\/.*?\/([^\/]+)/i,
-                example: 'https://serverliste.net/server/example'
-            },
-            'gtop100.com': {
-                regex: /gtop100\.com\/.*?\/([^\/]+)/i,
-                example: 'https://gtop100.com/server/example'
-            },
-            'wargm.ru': {
-                regex: /wargm\.ru\/.*?\/([^\/]+)/i,
-                example: 'https://wargm.ru/server/example'
-            },
-            'minestatus.net': {
-                regex: /minestatus\.net\/.*?\/([^\/]+)/i,
-                example: 'https://minestatus.net/server/example'
-            },
-            'misterlauncher.org': {
-                regex: /misterlauncher\.org\/.*?\/([^\/]+)/i,
-                example: 'https://misterlauncher.org/server/example'
-            }
+        const state = {
+            projects: [],
+            projectMap: {},
+            supportedSites: [],
+            debugEnabled: false,
+            lastStatusPoll: 0,
         };
-        
-        function parseVoteURL(url) {
-            // Normalize URL
-            url = url.trim();
-            if (!url.startsWith('http://') && !url.startsWith('https://')) {
-                url = 'https://' + url;
+
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', () => switchToTab(tab.dataset.tab));
+        });
+
+        function switchToTab(tabId) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            document.querySelector(`.tab[data-tab="${tabId}"]`).classList.add('active');
+            document.getElementById(tabId).classList.add('active');
+            if (tabId === 'projects') {
+                loadProjects(false);
+                pollProjectStatuses();
             }
-            
-            // Remove trailing slash for matching
-            const urlForMatching = url.replace(/\/$/, '');
-            
-            // Try to match against each pattern
-            for (const [provider, pattern] of Object.entries(URL_PATTERNS)) {
-                const match = urlForMatching.match(pattern.regex);
-                if (match) {
-                    const idIndex = pattern.idIndex || 1;
-                    return {
-                        provider: provider,
-                        projectId: match[idIndex],
-                        success: true
-                    };
-                }
+            if (tabId === 'settings') {
+                loadSettings(false);
             }
-            
-            return {
-                success: false,
-                error: 'No project ID found in the pasted URL. Please paste a valid vote link.'
-            };
+            if (tabId === 'statistics') {
+                loadStats();
+            }
         }
-        
-        // URL input handler
-        document.getElementById('vote-url').addEventListener('input', (e) => {
-            const url = e.target.value;
-            const errorDiv = document.getElementById('url-parse-error');
-            
-            if (!url || url.length < 10) {
-                errorDiv.style.display = 'none';
+
+        function bootstrap() {
+            fetchSites();
+            loadSettings(true).then(() => {
+                loadProjects(true).then(() => {
+                    pollProjectStatuses();
+                    if (state.debugEnabled) {
+                        loadStorageHealth();
+                        loadLogs();
+                    }
+                });
+            });
+            loadStats();
+            setInterval(() => {
+                const activeTab = document.querySelector('.tab.active').dataset.tab;
+                if (activeTab === 'projects') {
+                    pollProjectStatuses();
+                    if (state.debugEnabled) {
+                        loadStorageHealth();
+                        loadLogs();
+                    }
+                } else if (activeTab === 'statistics') {
+                    loadStats();
+                }
+            }, 5000);
+        }
+
+        async function fetchSites() {
+            try {
+                const res = await fetch('/api/sites');
+                const data = await res.json();
+                if (data.success) {
+                    state.supportedSites = data.sites;
+                    const select = document.getElementById('rating');
+                    select.innerHTML = '<option value="">Select a site...</option>';
+                    data.sites.forEach(site => {
+                        const option = document.createElement('option');
+                        option.value = site.key;
+                        option.textContent = site.label;
+                        select.appendChild(option);
+                    });
+                    document.getElementById('supported-sites').textContent = data.sites.map(s => s.label).join(', ');
+                }
+            } catch (err) {
+                console.error(err);
+            }
+        }
+
+        async function loadProjects(fullRefresh = false) {
+            try {
+                const res = await fetch('/api/projects');
+                const data = await res.json();
+                if (!data.success) {
+                    showNotification('Error loading projects: ' + data.error, true);
+                    return;
+                }
+                if (fullRefresh) {
+                    state.projects = data.projects;
+                } else {
+                    const map = {};
+                    data.projects.forEach(p => { map[p.key] = p; });
+                    state.projects = state.projects.map(p => map[p.key] || p);
+                }
+                state.projectMap = {};
+                state.projects.forEach(project => state.projectMap[project.key] = project);
+                renderProjects();
+                updateProjectFilterOptions();
+            } catch (err) {
+                showNotification('Error loading projects: ' + err, true);
+            }
+        }
+
+        async function pollProjectStatuses() {
+            try {
+                const res = await fetch('/api/projects/status');
+                const data = await res.json();
+                if (!data.success) return;
+                data.projects.forEach(statusProject => {
+                    const existing = state.projectMap[statusProject.key];
+                    if (existing) {
+                        existing.runtime = statusProject.runtime;
+                        existing.stats = statusProject.stats;
+                    }
+                });
+                renderProjects(true);
+            } catch (err) {
+                console.warn('Status poll failed', err);
+            }
+        }
+
+        function renderProjects(statusOnly = false) {
+            const list = document.getElementById('project-list');
+            if (!state.projects.length) {
+                list.innerHTML = '<div class="empty-state"><p>No projects yet. Add one to get started!</p></div>';
+                document.getElementById('project-summary').textContent = '';
                 return;
             }
-            
-            const result = parseVoteURL(url);
-            
-            if (result.success) {
-                // Auto-fill provider and project ID
-                document.getElementById('rating').value = result.provider;
-                document.getElementById('project-id').value = result.projectId;
-                errorDiv.style.display = 'none';
-                
-                // Visual feedback
-                e.target.style.borderColor = '#2ecc71';
+            document.getElementById('project-summary').textContent = `${state.projects.length} project${state.projects.length !== 1 ? 's' : ''} loaded`;
+            list.innerHTML = state.projects.map(project => renderProjectCard(project)).join('');
+            if (state.debugEnabled) {
+                document.getElementById('debug-panels').style.display = 'grid';
             } else {
-                // Show error
-                errorDiv.textContent = result.error + ' Examples: ' + 
-                    Object.values(URL_PATTERNS).slice(0, 3).map(p => p.example).join(', ');
-                errorDiv.style.display = 'block';
-                e.target.style.borderColor = '#e74c3c';
+                document.getElementById('debug-panels').style.display = 'none';
             }
-        });
-        
-        // Tab switching
-        document.querySelectorAll('.tab').forEach(tab => {
-            tab.addEventListener('click', () => {
-                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-                
-                tab.classList.add('active');
-                document.getElementById(tab.dataset.tab).classList.add('active');
-                
-                // Reload data when switching tabs
-                if (tab.dataset.tab === 'projects') loadProjects();
-                if (tab.dataset.tab === 'statistics') loadStats();
-                if (tab.dataset.tab === 'settings') loadSettings();
-            });
-        });
-        
-        // Load projects
-        function loadProjects() {
-            fetch('/api/projects')
-                .then(r => r.json())
-                .then(data => {
-                    const list = document.getElementById('project-list');
-                    
-                    if (!data.success || data.projects.length === 0) {
-                        list.innerHTML = '<div class="empty-state"><p>No projects yet. Add one to get started!</p></div>';
-                        return;
-                    }
-                    
-                    list.innerHTML = data.projects.map(p => `
-                        <div class="project-card ${p.error ? 'error' : ''}">
-                            <h3>[${p.rating}] ${p.name || p.id}</h3>
-                            <div class="project-info">
-                                <div><strong>ID:</strong> ${p.id || 'N/A'}</div>
-                                <div><strong>Nick:</strong> ${p.nick || 'N/A'}</div>
-                                <div><strong>Success:</strong> ${p.stats?.successVotes || 0}</div>
-                                <div><strong>Errors:</strong> ${p.stats?.errorVotes || 0}</div>
-                                <div><strong>Next Vote:</strong> ${p.time ? new Date(p.time).toLocaleString() : 'Soon'}</div>
-                            </div>
-                            ${p.error ? `<div style="color: #e74c3c; margin: 10px 0;">❌ ${p.error}</div>` : ''}
-                            <div class="project-actions">
-                                <button class="btn" onclick="restartProject('${p.key}')">Vote Now</button>
-                                <button class="btn btn-danger" onclick="deleteProject('${p.key}')">Delete</button>
+        }
+
+        function renderProjectCard(project) {
+            const runtime = project.runtime || {};
+            const status = runtime.status || 'IDLE';
+            const statusLabel = status.replace(/_/g, ' ');
+            const nextAttempt = runtime.nextAttemptAt ? formatDate(runtime.nextAttemptAt) : 'Not scheduled';
+            const countdown = runtime.nextAttemptAt ? formatCountdown(runtime.nextAttemptAt) : 'Not scheduled';
+            const lastAttempt = runtime.lastAttemptAt ? formatRelativeTime(runtime.lastAttemptAt) : 'Never';
+            const lastSuccess = runtime.lastSuccessAt ? formatRelativeTime(runtime.lastSuccessAt) : 'Never';
+            const working = ['QUEUED', 'IN_PROGRESS'].includes(status);
+            const lastAction = runtime.lastAction || runtime.lastResult?.message || '';
+            const attemptsToday = runtime.attemptsToday ?? 0;
+            const retriesRemaining = runtime.retriesRemaining ?? '–';
+            const timeline = runtime.timeline || [];
+            const timelineHtml = timeline.slice().reverse().map(entry => `
+                <li>
+                    <strong>${entry.type}</strong>
+                    <span class="ts">${formatDate(entry.timestamp)}</span>
+                    ${entry.message ? `<div>${entry.message}</div>` : ''}
+                </li>
+            `).join('');
+
+            return `
+                <div class="project-card ${working ? 'active' : ''}">
+                    ${working ? '<div class="working-overlay"><div class="spinner"></div></div>' : ''}
+                    <div style="display:flex; justify-content:space-between; gap:12px; align-items:center; flex-wrap:wrap;">
+                        <div>
+                            <h3>[${project.rating}] ${project.name || project.id}</h3>
+                            <div class="status-pill status-${status}">
+                                ${working ? '<span class="spinner"></span>' : ''}
+                                ${statusLabel}
                             </div>
                         </div>
-                    `).join('');
-                })
-                .catch(err => showNotification('Error loading projects: ' + err, true));
+                        <div class="project-actions">
+                            <button class="btn" data-vote-btn="${project.key}" onclick="voteNow('${project.key}')" ${working ? 'disabled' : ''}>
+                                ${working ? 'Working...' : 'Vote Now'}
+                            </button>
+                            <button class="btn btn-danger" onclick="deleteProject('${project.key}')">Delete</button>
+                        </div>
+                    </div>
+                    <div class="project-meta">
+                        <div><strong>Next Attempt:</strong> <span class="countdown">${countdown}</span><br><small>${nextAttempt}</small></div>
+                        <div><strong>Last Attempt:</strong> ${lastAttempt}</div>
+                        <div><strong>Last Success:</strong> ${lastSuccess}</div>
+                        <div><strong>Attempts Today:</strong> ${attemptsToday}</div>
+                        <div><strong>Retries Remaining:</strong> ${retriesRemaining}</div>
+                        <div><strong>Last Action:</strong> ${lastAction || '—'}</div>
+                    </div>
+                    ${state.debugEnabled ? `
+                        <div class="timeline">
+                            <h4>Recent Events</h4>
+                            ${timeline.length ? `<ul>${timelineHtml}</ul>` : '<div class="helper-text">No events recorded yet.</div>'}
+                        </div>` : ''}
+                </div>
+            `;
         }
-        
-        // Add project
-        document.getElementById('add-project-form').addEventListener('submit', (e) => {
+
+        async function deleteProject(key) {
+            if (!confirm('Delete this project?')) return;
+            try {
+                const res = await fetch(`/api/projects/${key}`, { method: 'DELETE' });
+                const data = await res.json();
+                if (data.success) {
+                    showNotification('Project deleted');
+                    loadProjects(true);
+                } else {
+                    showNotification('Error: ' + data.error, true);
+                }
+            } catch (err) {
+                showNotification('Error: ' + err, true);
+            }
+        }
+
+        async function voteNow(key) {
+            const btn = document.querySelector(`[data-vote-btn="${key}"]`);
+            if (btn) btn.disabled = true;
+            try {
+                const res = await fetch(`/api/projects/${key}/vote-now`, { method: 'POST' });
+                const data = await res.json();
+                if (data.success) {
+                    showNotification('Vote queued');
+                    const project = data.project;
+                    state.projectMap[key] = project;
+                    state.projects = state.projects.map(p => p.key === key ? project : p);
+                    renderProjects(true);
+                } else {
+                    showNotification('Error: ' + data.error, true);
+                }
+            } catch (err) {
+                showNotification('Error queueing vote: ' + err, true);
+            } finally {
+                if (btn) btn.disabled = false;
+            }
+        }
+
+        document.getElementById('add-project-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             const formData = new FormData(e.target);
-            const data = Object.fromEntries(formData);
-            
-            fetch('/api/projects', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify(data)
-            })
-            .then(r => r.json())
-            .then(data => {
+            const payload = Object.fromEntries(formData.entries());
+            payload.manualOverride = document.getElementById('manual-override').checked;
+            try {
+                const res = await fetch('/api/projects', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(payload)
+                });
+                const data = await res.json();
                 if (data.success) {
-                    showNotification('Project added successfully!');
+                    showNotification('Project added successfully');
                     e.target.reset();
+                    document.getElementById('rating').disabled = true;
+                    document.getElementById('project-id').disabled = true;
                     document.querySelector('[data-tab="projects"]').click();
+                    loadProjects(true);
                 } else {
                     showNotification('Error: ' + data.error, true);
                 }
-            })
-            .catch(err => showNotification('Error: ' + err, true));
+            } catch (err) {
+                showNotification('Error: ' + err, true);
+            }
         });
-        
-        // Delete project
-        function deleteProject(key) {
-            if (!confirm('Are you sure you want to delete this project?')) return;
-            
-            fetch(`/api/projects/${key}`, {method: 'DELETE'})
-                .then(r => r.json())
-                .then(data => {
-                    if (data.success) {
-                        showNotification('Project deleted');
-                        loadProjects();
-                    } else {
-                        showNotification('Error: ' + data.error, true);
-                    }
-                })
-                .catch(err => showNotification('Error: ' + err, true));
-        }
-        
-        // Restart project
-        function restartProject(key) {
-            fetch(`/api/projects/${key}/restart`, {method: 'POST'})
-                .then(r => r.json())
-                .then(data => {
-                    if (data.success) {
-                        showNotification('Project will vote shortly');
-                        setTimeout(loadProjects, 1000);
-                    } else {
-                        showNotification('Error: ' + data.error, true);
-                    }
-                })
-                .catch(err => showNotification('Error: ' + err, true));
-        }
-        
-        // Load settings
-        function loadSettings() {
-            fetch('/api/settings')
-                .then(r => r.json())
-                .then(data => {
-                    if (data.success) {
-                        const s = data.settings;
-                        document.getElementById('debug').checked = s.debug || false;
-                        document.getElementById('timeout').value = s.timeout || 5000;
-                        document.getElementById('timeoutError').value = s.timeoutError || 900000;
-                        document.getElementById('earliestTime').value = s.earliestTime || '09:00';
-                        document.getElementById('latestTime').value = s.latestTime || '21:00';
-                        document.getElementById('retryEnabled').checked = s.retryEnabled !== false;
-                        document.getElementById('maxRetriesPerDay').value = s.maxRetriesPerDay || 3;
-                    }
-                })
-                .catch(err => showNotification('Error loading settings: ' + err, true));
-        }
-        
-        // Download logs button
-        document.getElementById('download-logs-btn').addEventListener('click', () => {
-            window.location.href = '/api/logs/download';
+
+        document.getElementById('manual-override').addEventListener('change', (e) => {
+            const enabled = e.target.checked;
+            document.getElementById('rating').disabled = !enabled;
+            document.getElementById('project-id').disabled = !enabled;
         });
-        
-        // Save settings
-        document.getElementById('settings-form').addEventListener('submit', (e) => {
-            e.preventDefault();
-            const data = {
-                debug: document.getElementById('debug').checked,
-                timeout: parseInt(document.getElementById('timeout').value),
-                timeoutError: parseInt(document.getElementById('timeoutError').value),
-                earliestTime: document.getElementById('earliestTime').value,
-                latestTime: document.getElementById('latestTime').value,
-                retryEnabled: document.getElementById('retryEnabled').checked,
-                maxRetriesPerDay: parseInt(document.getElementById('maxRetriesPerDay').value)
-            };
-            
-            fetch('/api/settings', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify(data)
-            })
-            .then(r => r.json())
-            .then(data => {
+
+        let parseTimeout = null;
+        document.getElementById('vote-url').addEventListener('input', (e) => {
+            clearTimeout(parseTimeout);
+            parseTimeout = setTimeout(() => {
+                if (!e.target.value.trim()) {
+                    document.getElementById('url-parse-error').style.display = 'none';
+                    return;
+                }
+                parseVoteUrl(e.target.value.trim());
+            }, 500);
+        });
+
+        async function parseVoteUrl(url) {
+            if (document.getElementById('manual-override').checked) return;
+            try {
+                const res = await fetch('/api/parse-vote-url', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({url})
+                });
+                const data = await res.json();
                 if (data.success) {
-                    showNotification('Settings saved!');
+                    document.getElementById('rating').value = data.result.siteKey;
+                    document.getElementById('project-id').value = data.result.projectId;
+                    document.getElementById('url-parse-error').style.display = 'none';
+                } else {
+                    document.getElementById('url-parse-error').textContent = data.error;
+                    document.getElementById('url-parse-error').style.display = 'block';
+                }
+            } catch (err) {
+                document.getElementById('url-parse-error').textContent = err;
+                document.getElementById('url-parse-error').style.display = 'block';
+            }
+        }
+
+        async function loadSettings(initial = false) {
+            try {
+                const res = await fetch('/api/settings');
+                const data = await res.json();
+                if (!data.success) {
+                    showNotification('Error loading settings: ' + data.error, true);
+                    return;
+                }
+                const s = data.settings;
+                document.getElementById('debug').checked = s.debug || false;
+                document.getElementById('timeout').value = s.timeout || 5000;
+                document.getElementById('timeoutError').value = s.timeoutError || 900000;
+                document.getElementById('dailyWindowStart').value = s.dailyWindowStart || '09:00';
+                document.getElementById('dailyWindowEnd').value = s.dailyWindowEnd || '21:00';
+                document.getElementById('jitterMinutes').value = s.jitterMinutes ?? 25;
+                const policy = s.retryPolicy || {};
+                document.getElementById('retryBackoffMinutes').value = policy.retryBackoffMinutes ?? 45;
+                document.getElementById('retryJitterMinutes').value = policy.retryJitterMinutes ?? 10;
+                document.getElementById('retryWindowEnd').value = policy.retryWindowEnd || '23:00';
+                document.getElementById('maxRetriesPerDay').value = policy.maxRetriesPerDay ?? 3;
+                state.debugEnabled = !!s.debug;
+                if (!initial) {
+                    renderProjects();
+                }
+            } catch (err) {
+                showNotification('Error loading settings: ' + err, true);
+            }
+        }
+
+        document.getElementById('settings-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const payload = {
+                debug: document.getElementById('debug').checked,
+                timeout: parseInt(document.getElementById('timeout').value, 10),
+                timeoutError: parseInt(document.getElementById('timeoutError').value, 10),
+                dailyWindowStart: document.getElementById('dailyWindowStart').value,
+                dailyWindowEnd: document.getElementById('dailyWindowEnd').value,
+                jitterMinutes: parseInt(document.getElementById('jitterMinutes').value, 10),
+                retryPolicy: {
+                    retryBackoffMinutes: parseInt(document.getElementById('retryBackoffMinutes').value, 10),
+                    retryJitterMinutes: parseInt(document.getElementById('retryJitterMinutes').value, 10),
+                    retryWindowEnd: document.getElementById('retryWindowEnd').value,
+                    maxRetriesPerDay: parseInt(document.getElementById('maxRetriesPerDay').value, 10),
+                }
+            };
+            try {
+                const res = await fetch('/api/settings', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(payload)
+                });
+                const data = await res.json();
+                if (data.success) {
+                    showNotification('Settings saved');
+                    state.debugEnabled = payload.debug;
+                    renderProjects();
                 } else {
                     showNotification('Error: ' + data.error, true);
                 }
-            })
-            .catch(err => showNotification('Error: ' + err, true));
+            } catch (err) {
+                showNotification('Error saving settings: ' + err, true);
+            }
         });
-        
-        // Load statistics
-        function loadStats() {
-            fetch('/api/stats')
-                .then(r => r.json())
-                .then(data => {
-                    if (data.success) {
-                        const g = data.stats.generalStats || {};
-                        const t = data.stats.todayStats || {};
-                        document.getElementById('total-success').textContent = g.successVotes || 0;
-                        document.getElementById('month-success').textContent = g.monthSuccessVotes || 0;
-                        document.getElementById('today-success').textContent = t.successVotes || 0;
-                        document.getElementById('total-errors').textContent = g.errorVotes || 0;
-                    }
-                })
-                .catch(err => showNotification('Error loading stats: ' + err, true));
+
+        document.getElementById('download-worker-log').addEventListener('click', () => {
+            window.location.href = '/api/logs/download?source=worker';
+        });
+        document.getElementById('download-debug-log').addEventListener('click', () => {
+            window.location.href = '/api/logs/download?source=debug';
+        });
+
+        async function loadStats() {
+            try {
+                const res = await fetch('/api/stats');
+                const data = await res.json();
+                if (!data.success) return;
+                const g = data.stats.generalStats || {};
+                const t = data.stats.todayStats || {};
+                document.getElementById('total-success').textContent = g.successVotes || 0;
+                document.getElementById('month-success').textContent = g.monthSuccessVotes || 0;
+                document.getElementById('today-success').textContent = t.successVotes || 0;
+                document.getElementById('total-errors').textContent = g.errorVotes || 0;
+            } catch (err) {
+                console.warn('Stats error', err);
+            }
         }
-        
-        // Show notification
+
+        async function loadStorageHealth() {
+            if (!state.debugEnabled) return;
+            try {
+                const res = await fetch('/api/storage-health');
+                const data = await res.json();
+                if (!data.success) return;
+                const h = data.health;
+                const items = [
+                    `<strong>Dashboard Path:</strong> ${h.dashboardDataDir}`,
+                    `<strong>Worker/Dashboard Path:</strong> ${h.dataDir}`,
+                    `<strong>Projects:</strong> ${h.projectsCount}`,
+                    `<strong>Last Updated:</strong> ${formatDate(h.lastUpdatedAt)}`,
+                    `<strong>Last Worker Tick:</strong> ${formatDate(h.lastWorkerTickAt)}`
+                ];
+                document.getElementById('storage-health').innerHTML = items.map(item => `<li>${item}</li>`).join('');
+            } catch (err) {
+                console.warn('Storage health error', err);
+            }
+        }
+
+        async function loadLogs() {
+            if (!state.debugEnabled) return;
+            try {
+                const projectKey = document.getElementById('log-project-filter').value || '';
+                const res = await fetch(`/api/logs?limit=200${projectKey ? `&projectKey=${projectKey}` : ''}`);
+                const data = await res.json();
+                if (!data.success) return;
+                const container = document.getElementById('logs-list');
+                if (!data.logs.length) {
+                    container.innerHTML = '<div class="helper-text">No logs yet.</div>';
+                    return;
+                }
+                container.innerHTML = data.logs.map(entry => `
+                    <div class="log-entry">
+                        <div><strong>${formatDate(entry.timestamp)}</strong></div>
+                        <div>${entry.event || 'log'} ${entry.projectName ? `- ${entry.projectName}` : ''}</div>
+                        ${entry.message ? `<div>${entry.message}</div>` : ''}
+                    </div>
+                `).join('');
+            } catch (err) {
+                console.warn('Logs error', err);
+            }
+        }
+
+        document.getElementById('refresh-logs-btn').addEventListener('click', loadLogs);
+
+        function updateProjectFilterOptions() {
+            const select = document.getElementById('log-project-filter');
+            const prev = select.value;
+            select.innerHTML = '<option value="">All projects</option>';
+            state.projects.forEach(project => {
+                const option = document.createElement('option');
+                option.value = project.key;
+                option.textContent = project.name || project.id || `Project ${project.key}`;
+                select.appendChild(option);
+            });
+            select.value = prev;
+        }
+
         function showNotification(message, isError = false) {
             const notif = document.createElement('div');
             notif.className = 'notification' + (isError ? ' error' : '');
             notif.textContent = message;
             document.body.appendChild(notif);
-            setTimeout(() => notif.remove(), 3000);
+            setTimeout(() => notif.remove(), 3200);
         }
-        
-        // Load projects on startup
-        loadProjects();
-        
-        // Auto-refresh every 30 seconds
-        setInterval(() => {
-            const activeTab = document.querySelector('.tab.active').dataset.tab;
-            if (activeTab === 'projects') loadProjects();
-            if (activeTab === 'statistics') loadStats();
-        }, 30000);
+
+        function formatDate(value) {
+            if (!value) return 'N/A';
+            try {
+                const date = new Date(value);
+                if (Number.isNaN(date.getTime())) return value;
+                return date.toLocaleString();
+            } catch {
+                return value;
+            }
+        }
+
+        function formatRelativeTime(value) {
+            if (!value) return 'N/A';
+            const date = new Date(value);
+            const diff = Date.now() - date.getTime();
+            if (Number.isNaN(diff)) return value;
+            if (diff < 60000) return 'Just now';
+            const mins = Math.floor(diff / 60000);
+            if (mins < 60) return `${mins}m ago`;
+            const hours = Math.floor(mins / 60);
+            if (hours < 24) return `${hours}h ago`;
+            const days = Math.floor(hours / 24);
+            return `${days}d ago`;
+        }
+
+        function formatCountdown(value) {
+            const date = new Date(value);
+            if (Number.isNaN(date.getTime())) return 'Unknown';
+            const diff = date.getTime() - Date.now();
+            if (diff <= 0) return 'Due now';
+            const secs = Math.floor(diff / 1000);
+            const mins = Math.floor(secs / 60);
+            if (mins < 60) return `${mins}m`;
+            const hours = Math.floor(mins / 60);
+            const remainingMins = mins % 60;
+            if (hours < 24) return `${hours}h ${remainingMins}m`;
+            const days = Math.floor(hours / 24);
+            return `${days}d ${hours % 24}h`;
+        }
+
+        document.addEventListener('DOMContentLoaded', bootstrap);
     </script>
 </body>
 </html>

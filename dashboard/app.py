@@ -15,6 +15,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'worker'))
 
 from database import Database
 from config import Config
+from sites import parse_vote_url, get_supported_sites, build_vote_url
 
 # Setup logging
 logging.basicConfig(
@@ -32,6 +33,39 @@ config = Config()
 db = Database(config.data_dir)
 db.initialize()
 
+DEFAULT_URL_EXAMPLE = "https://minecraft-server.eu/vote/index/208F7/"
+
+
+def resolve_vote_target(payload: dict) -> tuple[str, str, str]:
+    """
+    Resolve the canonical vote site, project id and normalized URL
+    based on provided voteUrl or manual overrides.
+    """
+    vote_url = payload.get('voteUrl') or payload.get('voteURL')
+    manual_override = payload.get('manualOverride', False)
+    rating = payload.get('rating')
+    project_id = payload.get('id') or payload.get('projectId')
+    normalized_url = None
+
+    if vote_url:
+        parsed = parse_vote_url(vote_url)
+        if parsed:
+            rating = parsed['siteKey']
+            project_id = parsed['projectId']
+            normalized_url = parsed['normalizedUrl']
+        elif not manual_override:
+            raise ValueError(f"Unknown or invalid vote URL. Example: {DEFAULT_URL_EXAMPLE}")
+
+    if not rating or not project_id:
+        raise ValueError("Vote site and project ID are required")
+
+    if not normalized_url:
+        normalized_url = build_vote_url(rating, project_id)
+
+    if not normalized_url:
+        raise ValueError(f"Unknown vote site. Example: {DEFAULT_URL_EXAMPLE}")
+
+    return rating, str(project_id).strip(), normalized_url
 
 @app.route('/')
 def index():
@@ -47,6 +81,27 @@ def get_projects():
         return jsonify({'success': True, 'projects': projects})
     except Exception as e:
         logger.error(f"Error getting projects: {e}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+@app.route('/api/projects/status', methods=['GET'])
+def get_project_status():
+    """Return lightweight runtime status for polling."""
+    try:
+        projects = db.get_all_projects()
+        summary = []
+        for project in projects:
+            summary.append({
+                'key': project['key'],
+                'rating': project.get('rating'),
+                'name': project.get('name'),
+                'id': project.get('id'),
+                'runtime': project.get('runtime', {}),
+                'stats': project.get('stats', {}),
+            })
+        return jsonify({'success': True, 'projects': summary})
+    except Exception as e:
+        logger.error(f"Error getting project status: {e}")
         return jsonify({'success': False, 'error': str(e)}), 500
 
 
@@ -68,14 +123,21 @@ def get_project(key):
 def add_project():
     """Add a new project"""
     try:
-        project_data = request.json
-        
-        # Validate required fields
-        if 'rating' not in project_data:
-            return jsonify({'success': False, 'error': 'Rating is required'}), 400
-        
+        payload = request.json or {}
+        rating, project_id, vote_url = resolve_vote_target(payload)
+        project_data = {
+            'rating': rating,
+            'id': project_id,
+            'voteUrl': vote_url,
+            'nick': payload.get('nick'),
+            'name': payload.get('name'),
+            'notes': payload.get('notes'),
+        }
         key = db.add_project(project_data)
-        return jsonify({'success': True, 'key': key})
+        project = db.get_project(key)
+        return jsonify({'success': True, 'project': project})
+    except ValueError as ve:
+        return jsonify({'success': False, 'error': str(ve)}), 400
     except Exception as e:
         logger.error(f"Error adding project: {e}")
         return jsonify({'success': False, 'error': str(e)}), 500
@@ -85,11 +147,25 @@ def add_project():
 def update_project(key):
     """Update a project"""
     try:
-        project_data = request.json
-        project_data['key'] = key
-        
-        db.update_project(project_data)
-        return jsonify({'success': True})
+        payload = request.json or {}
+        project = db.get_project(key)
+        if not project:
+            return jsonify({'success': False, 'error': 'Project not found'}), 404
+        vote_fields = {'voteUrl', 'voteURL', 'rating', 'id', 'projectId', 'manualOverride'}
+        if vote_fields.intersection(payload.keys()):
+            try:
+                rating, project_id, vote_url = resolve_vote_target({**project, **payload})
+                project['rating'] = rating
+                project['id'] = project_id
+                project['voteUrl'] = vote_url
+            except ValueError as ve:
+                return jsonify({'success': False, 'error': str(ve)}), 400
+        for key_name, value in payload.items():
+            if key_name in vote_fields:
+                continue
+            project[key_name] = value
+        db.update_project(project)
+        return jsonify({'success': True, 'project': project})
     except Exception as e:
         logger.error(f"Error updating project: {e}")
         return jsonify({'success': False, 'error': str(e)}), 500
@@ -129,6 +205,18 @@ def update_settings():
         return jsonify({'success': False, 'error': str(e)}), 500
 
 
+@app.route('/api/storage-health', methods=['GET'])
+def storage_health():
+    """Return current storage details for debug panel."""
+    try:
+        health = db.get_storage_health()
+        health['dashboardDataDir'] = config.data_dir
+        return jsonify({'success': True, 'health': health})
+    except Exception as e:
+        logger.error(f"Error fetching storage health: {e}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
 @app.route('/api/stats', methods=['GET'])
 def get_stats():
     """Get statistics"""
@@ -137,6 +225,23 @@ def get_stats():
         return jsonify({'success': True, 'stats': stats})
     except Exception as e:
         logger.error(f"Error getting stats: {e}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+@app.route('/api/parse-vote-url', methods=['POST'])
+def api_parse_vote_url():
+    """Parse vote URL on demand (used by UI)."""
+    try:
+        payload = request.json or {}
+        url = payload.get('url')
+        if not url:
+            return jsonify({'success': False, 'error': 'URL is required'}), 400
+        parsed = parse_vote_url(url)
+        if not parsed:
+            return jsonify({'success': False, 'error': f'Unknown vote site. Example: {DEFAULT_URL_EXAMPLE}'}), 400
+        return jsonify({'success': True, 'result': parsed})
+    except Exception as e:
+        logger.error(f"Error parsing vote URL: {e}")
         return jsonify({'success': False, 'error': str(e)}), 500
 
 
@@ -160,21 +265,40 @@ def health_check():
         }), 503
 
 
+@app.route('/api/sites', methods=['GET'])
+def list_supported_sites():
+    """List vote sites for UI."""
+    try:
+        sites = get_supported_sites()
+        return jsonify({'success': True, 'sites': sites})
+    except Exception as e:
+        logger.error(f"Error getting sites: {e}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
 @app.route('/api/projects/<key>/restart', methods=['POST'])
 def restart_project(key):
     """Restart voting for a project (vote now)"""
     try:
-        project = db.get_project(key)
+        project = db.queue_vote_now(key, source='dashboard-legacy')
         if not project:
             return jsonify({'success': False, 'error': 'Project not found'}), 404
-        
-        # Clear the next vote time to trigger immediate voting
-        project['time'] = None
-        db.update_project(project)
-        
-        return jsonify({'success': True})
+        return jsonify({'success': True, 'project': project})
     except Exception as e:
         logger.error(f"Error restarting project: {e}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+@app.route('/api/projects/<key>/vote-now', methods=['POST'])
+def vote_now(key):
+    """Queue an immediate vote attempt, returning the updated status."""
+    try:
+        project = db.queue_vote_now(key, source='dashboard')
+        if not project:
+            return jsonify({'success': False, 'error': 'Project not found'}), 404
+        return jsonify({'success': True, 'project': project})
+    except Exception as e:
+        logger.error(f"Error queueing vote-now: {e}")
         return jsonify({'success': False, 'error': str(e)}), 500
 
 
@@ -182,14 +306,34 @@ def restart_project(key):
 def download_logs():
     """Download worker logs"""
     try:
-        log_file = os.path.join(config.data_dir, 'worker.log')
+        source = request.args.get('source', 'worker')
+        if source == 'debug':
+            log_file = os.path.join(config.data_dir, 'debug.log.jsonl')
+            download_name = 'debug.log.jsonl'
+        else:
+            log_file = os.path.join(config.data_dir, 'worker.log')
+            download_name = 'worker.log'
         if os.path.exists(log_file):
             from flask import send_file
-            return send_file(log_file, as_attachment=True, download_name='worker.log')
+            return send_file(log_file, as_attachment=True, download_name=download_name)
         else:
             return jsonify({'success': False, 'error': 'Log file not found'}), 404
     except Exception as e:
         logger.error(f"Error downloading logs: {e}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+@app.route('/api/logs', methods=['GET'])
+def list_logs():
+    """Return debug logs (newest first)."""
+    try:
+        limit = int(request.args.get('limit', 200))
+        limit = max(1, min(limit, 1000))
+        project_key = request.args.get('projectKey')
+        logs = db.get_logs(limit=limit, project_key=project_key)
+        return jsonify({'success': True, 'logs': logs})
+    except Exception as e:
+        logger.error(f"Error loading logs: {e}")
         return jsonify({'success': False, 'error': str(e)}), 500
 
 

@@ -1,0 +1,11 @@
+# Im Projektordner (dort wo dein Dockerfile liegt)
+docker buildx build --platform linux/amd64 -t auto-voter:latest .
+
+# Prüfen, ob Image vorhanden:
+docker images auto-voter
+
+# Als TAR exportieren:
+docker save -o auto-voter.tar auto-voter:latest
+
+#compact everything command
+docker buildx build --platform linux/amd64 -t auto-voter:latest . && docker save -o auto-voter.tar auto-voter:latest
