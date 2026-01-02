@@ -42,8 +42,6 @@ RUN playwright install chromium
 # Copy application code
 COPY worker/ ./worker/
 COPY dashboard/ ./dashboard/
-COPY scripts/ ./scripts/
-COPY projects.js .
 COPY start.sh .
 
 # Create data directory for persistent storage
