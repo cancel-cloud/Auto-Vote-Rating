@@ -77,6 +77,12 @@ def _default_runtime() -> Dict[str, Any]:
         "manualTrigger": False,
         "lastAction": None,
         "needsActionUntil": None,
+        "captchaType": None,
+        "cdpUrl": None,
+        "cdpBrowserActive": False,
+        "manualBrowserRequested": False,
+        "manualSolveCompleted": False,
+        "manualBrowserLaunching": False,
     }
 
 

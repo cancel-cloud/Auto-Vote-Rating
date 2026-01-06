@@ -816,19 +816,19 @@
                                 <div class="cdp-active">
                                     <p><strong>✓ Browser is ready!</strong></p>
                                     <div class="captcha-actions">
-                                        <a href="${runtime.cdpUrl}" target="_blank" class="btn btn-primary">
+                                        <button onclick="openManualBrowser('${project.key}')" class="btn btn-primary">
                                             🌐 Open Browser
-                                        </a>
+                                        </button>
                                         <button onclick="completeManualSolve('${project.key}')" class="btn btn-success">
                                             ✓ I Solved It - Resume Automation
                                         </button>
                                     </div>
                                     <small class="helper-text">Access the browser above to solve the captcha, then click "I Solved It"</small>
                                 </div>
-                            ` : runtime.manualBrowserRequested ? `
+                            ` : (runtime.manualBrowserLaunching || runtime.manualBrowserRequested) ? `
                                 <div class="cdp-waiting">
                                     <div class="spinner"></div>
-                                    <p>Launching browser... (ready within 60 seconds)</p>
+                                    <p>Launching browser... (ready within a few seconds)</p>
                                 </div>
                             ` : `
                                 <div class="cdp-request">
@@ -936,6 +936,26 @@
             } catch (err) {
                 console.error('Error completing manual solve:', err);
                 showNotification('Failed to complete manual solve', true);
+            }
+        }
+
+        async function openManualBrowser(key) {
+            try {
+                const res = await fetch(`/api/projects/${key}/cdp-info`);
+                const data = await res.json();
+                if (!data.success) {
+                    showNotification('Unable to fetch browser info: ' + (data.error || 'Unknown error'), true);
+                    return;
+                }
+                const targetUrl = data.frontendUrl || data.cdpUrl;
+                if (!targetUrl) {
+                    showNotification('Browser not ready yet. Please wait a moment.', true);
+                    return;
+                }
+                window.open(targetUrl, '_blank', 'noopener');
+            } catch (err) {
+                console.error('Error opening manual browser:', err);
+                showNotification('Failed to open browser: ' + err, true);
             }
         }
 

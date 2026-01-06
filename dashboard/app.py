@@ -6,6 +6,8 @@ import os
 import sys
 import json
 import logging
+import urllib.request
+import urllib.parse
 from datetime import datetime
 from pathlib import Path
 from flask import Flask, render_template, request, jsonify, send_from_directory
@@ -34,6 +36,39 @@ db = Database(config.data_dir)
 db.initialize()
 
 DEFAULT_URL_EXAMPLE = "https://minecraft-server.eu/vote/index/208F7/"
+def build_devtools_frontend_url(cdp_url: str) -> str:
+    """
+    Resolve the Chrome DevTools frontend URL for a remote debugging target.
+    """
+    list_url = urllib.parse.urljoin(cdp_url.rstrip("/") + "/", "json/list")
+    with urllib.request.urlopen(list_url, timeout=5) as resp:
+        targets = json.load(resp)
+
+    def pick_target():
+        for target in targets:
+            if target.get("type") != "page":
+                continue
+            target_url = target.get("url") or ""
+            if target_url and target_url != "about:blank":
+                return target
+        return targets[0] if targets else None
+
+    target = pick_target()
+    if not target:
+        raise RuntimeError("No page targets available for manual browser")
+
+    frontend_path = target.get("devtoolsFrontendUrl") or target.get("devtoolsFrontendUrlCompat")
+    if not frontend_path:
+        ws = target.get("webSocketDebuggerUrl")
+        if not ws:
+            raise RuntimeError("DevTools frontend URL not available for manual browser")
+        frontend_path = f"/devtools/inspector.html?ws={ws.replace('ws://', '').replace('wss://', '')}"
+
+    if frontend_path.startswith(("http://", "https://")):
+        return frontend_path
+
+    base = cdp_url.rstrip("/")
+    return urllib.parse.urljoin(base + "/", frontend_path.lstrip("/"))
 
 
 def resolve_vote_target(payload: dict) -> tuple[str, str, str]:
@@ -420,12 +455,22 @@ def get_cdp_info(key):
                 'error': 'Manual browser not active'
             }), 400
 
-        return jsonify({
+        frontend_url = None
+        try:
+            frontend_url = build_devtools_frontend_url(cdp_url)
+        except Exception as e:
+            logger.warning(f"Failed to resolve DevTools frontend URL: {e}")
+
+        payload = {
             'success': True,
             'cdpUrl': cdp_url,
             'authToken': config.cdp_auth_token,
-            'instructions': f'Access browser at: {cdp_url}?token={config.cdp_auth_token}'
-        })
+            'instructions': f'Access browser at: {cdp_url}',
+        }
+        if frontend_url:
+            payload['frontendUrl'] = frontend_url
+
+        return jsonify(payload)
     except Exception as e:
         logger.error(f"Error getting CDP info: {e}")
         return jsonify({'success': False, 'error': str(e)}), 500

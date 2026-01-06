@@ -6,7 +6,8 @@ services:
     container_name: auto-vote-rating
     restart: unless-stopped
     ports:
-      - "8080:8080"
+      - "8080:8080"        # Dashboard
+      - "9222:9222"        # CDP port for manual browser access
     volumes:
       - ./data:/app/data
     environment:
@@ -17,9 +18,34 @@ services:
       - HEADLESS=true
       - DEBUG=false
       - BROWSER_TIMEOUT=30000
+      - VOTE_BUTTON_MAX_WAIT=12  # Max seconds to poll for vote button
+      - VOTE_BUTTON_POLL_INTERVAL=1000  # Milliseconds between polls
+
+      # Automation settings
+      - AUTOMATION_ENABLED=true
+      - PLAYWRIGHT_PROFILE_DIR=/app/data/playwright-profile
+
+      # Chrome DevTools Protocol (for manual captcha solving)
+      - CDP_ENABLED=true
+      - CDP_BASE_PORT=9222
+      - CDP_HOST=0.0.0.0  # Bind address (listen on all interfaces inside container)
+      - CDP_PUBLIC_HOST=${CDP_PUBLIC_HOST:-localhost}  # IMPORTANT: Set this in .env file (localhost for dev, server IP for production)
+      - CDP_AUTH_TOKEN=${CDP_AUTH_TOKEN:-}  # Optional: Set in .env file or will be auto-generated
+
+      # Captcha timeout (5 minutes default)
+      - CAPTCHA_TIMEOUT_SECONDS=300
+
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
       interval: 30s
       timeout: 10s
       retries: 3
       start_period: 10s
+
+    # Resource limits to prevent browser memory bloat
+    deploy:
+      resources:
+        limits:
+          memory: 4G
+        reservations:
+          memory: 2G

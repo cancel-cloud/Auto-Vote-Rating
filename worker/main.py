@@ -113,6 +113,7 @@ class VoteWorker:
             # Check for manual intervention requests from dashboard
             self._check_manual_browser_requests()
             self._check_manual_solve_completions()
+            self._sync_manual_browser_statuses()
 
             # Reload projects after manual browser/solve checks to get updated state
             projects = self.db.get_all_projects()
@@ -167,6 +168,16 @@ class VoteWorker:
 
         self._reset_daily_counters(runtime, settings, now_local)
         self._settle_needs_action(project, runtime, now_utc)
+
+        # If we're waiting for the user to solve a captcha, keep the state sticky
+        if runtime.get("status") == ProjectStatus.NEEDS_USER_ACTION.value:
+            runtime["nextAttemptAt"] = None
+            project["time"] = None
+            logger.debug(
+                "[%s] Awaiting manual captcha resolution - skipping scheduling",
+                project.get("key"),
+            )
+            return "awaiting_manual_action"
 
         # Skip processing if manual browser is active
         if runtime.get("cdpBrowserActive"):
@@ -375,6 +386,8 @@ class VoteWorker:
             runtime["manualBrowserRequested"] = False  # Flag for dashboard to set
             runtime["cdpBrowserActive"] = False
             runtime["cdpUrl"] = None
+            runtime["nextAttemptAt"] = None
+            project["time"] = None
 
             self.db.append_project_event(project, "CAPTCHA_DETECTED",
                 f"Manual intervention required: {captcha_type}")
@@ -441,6 +454,8 @@ class VoteWorker:
             runtime["lastSuccessAt"] = _iso_from_dt(now_utc)
             runtime["needsActionUntil"] = _iso_from_dt(now_utc + timedelta(minutes=NEEDS_ACTION_WINDOW_MINUTES))
             runtime["retriesRemaining"] = policy.get("maxRetriesPerDay", 3)
+            runtime["nextAttemptAt"] = None
+            project["time"] = None
 
             project["stats"]["successVotes"] = project["stats"].get("successVotes", 0) + 1
             project["stats"]["monthSuccessVotes"] = project["stats"].get("monthSuccessVotes", 0) + 1
@@ -523,32 +538,35 @@ class VoteWorker:
 
                 try:
                     # Launch headful browser with CDP
+                    vote_url = project.get("voteUrl")
                     browser, cdp_url = self.voter.browser_manager.launch_headful_with_cdp(
-                        project_key
+                        project_key,
+                        initial_url=vote_url,
                     )
 
-                    logger.info(f"[{project_key}] Browser launch returned, CDP URL: {cdp_url}")
+                    logger.info(f"[{project_key}] Browser launch initiated for CDP URL: {cdp_url}")
 
-                    # Update runtime state
-                    runtime["cdpUrl"] = cdp_url
-                    runtime["cdpBrowserActive"] = True
                     runtime["manualBrowserRequested"] = False
-                    runtime["lastAction"] = "Manual browser launched - solve captcha to continue"
+                    runtime["manualBrowserLaunching"] = True
+                    runtime["cdpBrowserActive"] = False
+                    runtime["cdpUrl"] = None
+                    runtime["lastAction"] = "Launching manual browser for captcha solving..."
 
-                    # Ensure status reflects manual intervention needed
                     if runtime.get("status") != ProjectStatus.NEEDS_USER_ACTION.value:
                         runtime["status"] = ProjectStatus.NEEDS_USER_ACTION.value
 
                     self.db.update_project(project)
-                    self.db.append_project_event(project, "MANUAL_BROWSER_LAUNCHED",
-                        f"CDP URL: {cdp_url}")
+                    self.db.append_project_event(project, "MANUAL_BROWSER_LAUNCHING",
+                        "Manual browser launch requested")
 
-                    logger.info(f"[{project_key}] Manual browser state: cdpUrl={runtime['cdpUrl']}, active={runtime['cdpBrowserActive']}")
+                    logger.info(f"[{project_key}] Manual browser launching in background")
 
                 except Exception as e:
                     logger.error(f"[{project_key}] Failed to launch manual browser: {e}", exc_info=True)
                     runtime["manualBrowserRequested"] = False
+                    runtime["manualBrowserLaunching"] = False
                     runtime["lastAction"] = f"Error launching browser: {str(e)}"
+                    self.voter.browser_manager.clear_manual_browser_status(project_key)
                     self.db.update_project(project)
 
     def _check_manual_solve_completions(self):
@@ -606,6 +624,8 @@ class VoteWorker:
         runtime["captchaType"] = None
         runtime["needsActionUntil"] = None
         runtime["manualSolveCompleted"] = False
+        runtime["manualBrowserLaunching"] = False
+        self.voter.browser_manager.clear_manual_browser_status(project_key)
 
         # Update stats
         stats = project.get("stats", {})
@@ -630,6 +650,41 @@ class VoteWorker:
             "User solved captcha successfully")
 
         logger.info(f"[{project_key}] Manual solve completed, next vote scheduled for {future}")
+
+    def _sync_manual_browser_statuses(self):
+        """
+        Poll BrowserManager for launch results so we only expose CDP URL when ready.
+        """
+        projects = self.db.get_all_projects()
+        for project in projects:
+            project_key = project.get("key")
+            runtime = project.get("runtime", {})
+            info = self.voter.browser_manager.get_manual_browser_status(project_key)
+            if not info:
+                continue
+
+            status = info.get("status")
+            if status == "ready":
+                runtime["manualBrowserLaunching"] = False
+                runtime["cdpBrowserActive"] = True
+                runtime["cdpUrl"] = info.get("cdp_url")
+                runtime["lastAction"] = "Manual browser ready - open to solve captcha"
+                self.db.update_project(project)
+                self.db.append_project_event(project, "MANUAL_BROWSER_READY",
+                    f"CDP URL: {runtime['cdpUrl']}")
+                self.voter.browser_manager.clear_manual_browser_status(project_key)
+                logger.info(f"[{project_key}] Manual browser ready at {runtime['cdpUrl']}")
+            elif status == "error":
+                runtime["manualBrowserLaunching"] = False
+                runtime["cdpBrowserActive"] = False
+                runtime["cdpUrl"] = None
+                runtime["manualBrowserRequested"] = False
+                error_msg = info.get("error") or "Unknown error launching browser"
+                runtime["lastAction"] = f"Manual browser failed: {error_msg}"
+                self.db.update_project(project)
+                self.db.append_project_event(project, "MANUAL_BROWSER_FAILED", error_msg)
+                self.voter.browser_manager.clear_manual_browser_status(project_key)
+                logger.warning(f"[{project_key}] Manual browser failed to launch: {error_msg}")
 
 
 def main():

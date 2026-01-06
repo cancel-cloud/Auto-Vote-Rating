@@ -41,8 +41,12 @@ class BrowserContextManager:
         # Active persistent contexts (project_key -> BrowserContext)
         self.contexts: Dict[str, BrowserContext] = {}
 
-        # Active headful browsers for manual intervention (project_key -> Browser)
-        self.manual_browsers: Dict[str, Browser] = {}
+        # Active headful browsers (project_key -> BrowserContext)
+        self.manual_browsers: Dict[str, BrowserContext] = {}
+
+        # Lifecycle information for manual browsers
+        # project_key -> {"status": "launching"|"ready"|"error", "cdp_url": str, "error": Optional[str]}
+        self.manual_browser_states: Dict[str, Dict[str, Optional[str]]] = {}
 
         # Ensure profile base directory exists
         Path(self.config.playwright_profile_base).mkdir(parents=True, exist_ok=True)
@@ -141,8 +145,9 @@ class BrowserContextManager:
 
     def launch_headful_with_cdp(
         self,
-        project_key: str
-    ) -> Tuple[Browser, str]:
+        project_key: str,
+        initial_url: Optional[str] = None,
+    ) -> Tuple[Optional[BrowserContext], str]:
         """
         Launch a headless browser with CDP enabled for manual captcha solving.
 
@@ -197,6 +202,14 @@ class BrowserContextManager:
         # but browser will bind to cdp_host (0.0.0.0) to listen on all interfaces
         cdp_url = f"http://{self.config.cdp_public_host}:{cdp_port}"
 
+        # Track launching state so worker can update UI
+        self.manual_browser_states[project_key] = {
+            "status": "launching",
+            "cdp_url": cdp_url,
+            "error": None,
+            "initial_url": initial_url,
+        }
+
         logger.info(f"[{project_key}] Launching browser with CDP in background thread (headless mode)")
         logger.info(f"[{project_key}] CDP URL: {cdp_url}")
         logger.info(f"[{project_key}] Profile path: {profile_path}")
@@ -210,29 +223,37 @@ class BrowserContextManager:
                 # Create a new Playwright instance for this thread (Playwright is not thread-safe)
                 from playwright.sync_api import sync_playwright
                 with sync_playwright() as p:
-                    # Launch browser with CDP enabled
-                    # Using chromium.launch() instead of launch_persistent_context()
-                    # because launch_persistent_context doesn't properly expose the CDP port
-                    browser = p.chromium.launch(
-                        headless=True,  # HEADLESS mode - works in Docker, CDP still enabled
+                    # Launch persistent context with remote debugging enabled
+                    context = p.chromium.launch_persistent_context(
+                        user_data_dir=str(profile_path),
+                        headless=True,
                         args=[
                             '--no-sandbox',
                             '--disable-setuid-sandbox',
-                            f'--remote-debugging-address=0.0.0.0',  # Bind to all interfaces
-                            f'--remote-debugging-port={cdp_port}',  # Enable CDP for remote access
                             '--disable-dev-shm-usage',
-                            f'--user-data-dir={str(profile_path)}',  # Use persistent profile
+                            f'--remote-debugging-address=0.0.0.0',
+                            f'--remote-debugging-port={cdp_port}',
                         ],
-                    )
-
-                    # Create a context with the desired settings
-                    context = browser.new_context(
                         viewport={'width': 1280, 'height': 720},
                         user_agent='Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36',
                     )
 
-                    # Store browser (not context) so we can properly close it later
-                    self.manual_browsers[project_key] = browser
+                    self.manual_browsers[project_key] = context
+
+                    # Pre-open the vote page if provided so the user sees it immediately
+                    if initial_url:
+                        try:
+                            page = context.new_page()
+                            logger.info(f"[{project_key}] Background thread: Navigating manual browser to {initial_url}")
+                            page.goto(initial_url, wait_until="load", timeout=self.config.browser_timeout)
+                            logger.info(f"[{project_key}] Background thread: Manual browser page loaded")
+                        except Exception as nav_err:
+                            logger.warning(f"[{project_key}] Background thread: Failed to load {initial_url}: {nav_err}")
+                    state = self.manual_browser_states.get(project_key) or {}
+                    state["status"] = "ready"
+                    state["cdp_url"] = cdp_url
+                    state["error"] = None
+                    self.manual_browser_states[project_key] = state
 
                     logger.info(f"[{project_key}] Background thread: Browser launched successfully")
                     logger.info(f"[{project_key}] Background thread: User can access at: {cdp_url}")
@@ -248,9 +269,12 @@ class BrowserContextManager:
 
             except Exception as e:
                 logger.error(f"[{project_key}] Background thread: Failed to launch browser: {e}")
-                # If launch fails, remove from manual_browsers if it was added
                 if project_key in self.manual_browsers:
                     del self.manual_browsers[project_key]
+                state = self.manual_browser_states.get(project_key) or {}
+                state["status"] = "error"
+                state["error"] = str(e)
+                self.manual_browser_states[project_key] = state
 
         # Start the browser in a background thread
         import threading
@@ -267,6 +291,16 @@ class BrowserContextManager:
         logger.info(f"[{project_key}] Returning immediately - browser will be ready in 2-5 seconds")
 
         return None, cdp_url
+
+    def get_manual_browser_status(self, project_key: str) -> Optional[Dict[str, Optional[str]]]:
+        """Return the latest launch state for the manual browser."""
+        state = self.manual_browser_states.get(project_key)
+        return dict(state) if state else None
+
+    def clear_manual_browser_status(self, project_key: str):
+        """Clear launch state tracking for a manual browser."""
+        if project_key in self.manual_browser_states:
+            del self.manual_browser_states[project_key]
 
     def close_manual_browser(self, project_key: str):
         """
@@ -290,6 +324,7 @@ class BrowserContextManager:
             logger.error(f"[{project_key}] Error closing manual browser: {e}")
         finally:
             del self.manual_browsers[project_key]
+            self.clear_manual_browser_status(project_key)
 
     def cleanup_project_context(self, project_key: str):
         """
