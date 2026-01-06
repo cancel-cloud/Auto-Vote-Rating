@@ -11,6 +11,23 @@ echo "=========================================="
 # Create data directory if it doesn't exist
 mkdir -p /app/data
 
+# Create Playwright profile directory for persistent browser contexts
+echo "Initializing Playwright profile directory..."
+mkdir -p /app/data/playwright-profile
+chmod 755 /app/data/playwright-profile
+echo "Profile directory: /app/data/playwright-profile"
+
+# Generate CDP auth token if not set
+if [ -z "$CDP_AUTH_TOKEN" ]; then
+    export CDP_AUTH_TOKEN=$(python3 -c "import secrets; print(secrets.token_urlsafe(32))")
+    echo "Generated CDP auth token: $CDP_AUTH_TOKEN"
+    echo "IMPORTANT: Save this token to access manual browsers for captcha solving!"
+else
+    echo "Using provided CDP auth token"
+fi
+
+echo "CDP endpoint: http://localhost:${CDP_BASE_PORT:-9222}"
+
 # Start the dashboard in the background
 echo "Starting dashboard on port ${DASHBOARD_PORT:-8080}..."
 python /app/dashboard/app.py &

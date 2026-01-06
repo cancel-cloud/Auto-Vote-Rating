@@ -47,6 +47,10 @@ COPY start.sh .
 # Create data directory for persistent storage
 RUN mkdir -p /app/data
 
+# Create Playwright profile directory for persistent browser contexts
+RUN mkdir -p /app/data/playwright-profile && \
+    chmod 755 /app/data/playwright-profile
+
 # Make startup script executable
 RUN chmod +x start.sh
 

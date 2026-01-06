@@ -175,6 +175,110 @@
             font-size: 0.75rem;
             display: block;
         }
+        /* Captcha UI Styles */
+        .captcha-section {
+            margin-top: 16px;
+            padding: 16px;
+            background: linear-gradient(135deg, #4a2b1f 0%, #3d2419 100%);
+            border: 1px solid #ffb84d;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(255, 184, 77, 0.15);
+        }
+        .captcha-alert {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            margin-bottom: 16px;
+            padding: 12px;
+            background: rgba(255, 193, 7, 0.1);
+            border-radius: 8px;
+        }
+        .captcha-alert .icon {
+            font-size: 28px;
+            line-height: 1;
+            flex-shrink: 0;
+        }
+        .captcha-alert .captcha-content {
+            flex: 1;
+        }
+        .captcha-alert .captcha-content strong {
+            display: block;
+            color: #ffb84d;
+            font-size: 1rem;
+            margin-bottom: 4px;
+        }
+        .captcha-alert .captcha-content p {
+            margin: 0;
+            font-size: 0.9rem;
+            color: #d4a574;
+        }
+        .cdp-active,
+        .cdp-request,
+        .cdp-waiting {
+            margin-top: 12px;
+        }
+        .cdp-active p {
+            margin: 0 0 12px 0;
+            color: #a3e4b8;
+            font-size: 0.95rem;
+        }
+        .captcha-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 8px;
+        }
+        .cdp-waiting {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+        }
+        .cdp-waiting p {
+            margin: 0;
+            color: #b39ddb;
+        }
+        .cdp-request {
+            text-align: center;
+        }
+        .cdp-request button {
+            margin-bottom: 8px;
+        }
+        .cdp-request .helper-text,
+        .cdp-active .helper-text {
+            display: block;
+            font-size: 0.85rem;
+            color: #9f9f9f;
+            margin-top: 8px;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #2196f3 0%, #1976d2 100%);
+            color: white;
+            border: none;
+        }
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #1e88e5 0%, #1565c0 100%);
+        }
+        .btn-success {
+            background: linear-gradient(135deg, #4caf50 0%, #388e3c 100%);
+            color: white;
+            border: none;
+        }
+        .btn-success:hover {
+            background: linear-gradient(135deg, #43a047 0%, #2e7d32 100%);
+        }
+        .btn-warning {
+            background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%);
+            color: white;
+            border: none;
+            font-size: 1rem;
+            padding: 12px 24px;
+        }
+        .btn-warning:hover {
+            background: linear-gradient(135deg, #fb8c00 0%, #ef6c00 100%);
+        }
         .form-group {
             margin-bottom: 16px;
         }
@@ -699,6 +803,43 @@
                         <div><strong>Retries Remaining:</strong> ${retriesRemaining}</div>
                         <div><strong>Last Action:</strong> ${lastAction || '—'}</div>
                     </div>
+                    ${status === 'NEEDS_USER_ACTION' && runtime.captchaType ? `
+                        <div class="captcha-section">
+                            <div class="captcha-alert">
+                                <span class="icon">⚠️</span>
+                                <div class="captcha-content">
+                                    <strong>Captcha Detected: ${runtime.captchaType}</strong>
+                                    <p>Manual intervention required to continue automation</p>
+                                </div>
+                            </div>
+                            ${runtime.cdpBrowserActive && runtime.cdpUrl ? `
+                                <div class="cdp-active">
+                                    <p><strong>✓ Browser is ready!</strong></p>
+                                    <div class="captcha-actions">
+                                        <a href="${runtime.cdpUrl}" target="_blank" class="btn btn-primary">
+                                            🌐 Open Browser
+                                        </a>
+                                        <button onclick="completeManualSolve('${project.key}')" class="btn btn-success">
+                                            ✓ I Solved It - Resume Automation
+                                        </button>
+                                    </div>
+                                    <small class="helper-text">Access the browser above to solve the captcha, then click "I Solved It"</small>
+                                </div>
+                            ` : runtime.manualBrowserRequested ? `
+                                <div class="cdp-waiting">
+                                    <div class="spinner"></div>
+                                    <p>Launching browser... (ready within 60 seconds)</p>
+                                </div>
+                            ` : `
+                                <div class="cdp-request">
+                                    <button onclick="requestManualBrowser('${project.key}')" class="btn btn-warning">
+                                        🚀 Launch Browser to Solve
+                                    </button>
+                                    <small class="helper-text">Click to launch a browser where you can manually solve the captcha</small>
+                                </div>
+                            `}
+                        </div>
+                    ` : ''}
                     ${state.debugEnabled ? `
                         <div class="timeline">
                             <h4>Recent Events</h4>
@@ -743,6 +884,58 @@
                 showNotification('Error queueing vote: ' + err, true);
             } finally {
                 if (btn) btn.disabled = false;
+            }
+        }
+
+        async function requestManualBrowser(key) {
+            try {
+                const res = await fetch(`/api/projects/${key}/request-manual-browser`, {
+                    method: 'POST'
+                });
+                const data = await res.json();
+
+                if (data.success) {
+                    showNotification('Browser launch requested - will be ready within 60 seconds', false);
+
+                    // Update project state immediately to show waiting UI
+                    const project = data.project;
+                    state.projectMap[key] = project;
+                    state.projects = state.projects.map(p => p.key === key ? project : p);
+                    renderProjects(true);
+                } else {
+                    showNotification('Error: ' + data.error, true);
+                }
+            } catch (err) {
+                console.error('Error requesting manual browser:', err);
+                showNotification('Failed to request browser launch', true);
+            }
+        }
+
+        async function completeManualSolve(key) {
+            if (!confirm('Have you solved the captcha? This will close the browser and resume automation.')) {
+                return;
+            }
+
+            try {
+                const res = await fetch(`/api/projects/${key}/complete-manual-solve`, {
+                    method: 'POST'
+                });
+                const data = await res.json();
+
+                if (data.success) {
+                    showNotification('✓ Captcha marked as solved - automation resuming!', false);
+
+                    // Update project state
+                    const project = data.project;
+                    state.projectMap[key] = project;
+                    state.projects = state.projects.map(p => p.key === key ? project : p);
+                    renderProjects(true);
+                } else {
+                    showNotification('Error: ' + data.error, true);
+                }
+            } catch (err) {
+                console.error('Error completing manual solve:', err);
+                showNotification('Failed to complete manual solve', true);
             }
         }
 

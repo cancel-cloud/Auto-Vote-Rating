@@ -1,0 +1,374 @@
+auto-vote-rating  | ==========================================
+auto-vote-rating  | Starting Auto-Vote-Rating...
+auto-vote-rating  | ==========================================
+auto-vote-rating  | Initializing Playwright profile directory...
+auto-vote-rating  | Profile directory: /app/data/playwright-profile
+auto-vote-rating  | Generated CDP auth token: 59YNt70uqg3ug-G-h58wKY2baQkc59EqgW0o0pDaNAg
+auto-vote-rating  | IMPORTANT: Save this token to access manual browsers for captcha solving!
+auto-vote-rating  | CDP endpoint: http://localhost:9222
+auto-vote-rating  | Starting dashboard on port 8080...
+auto-vote-rating  | Dashboard PID: 11
+auto-vote-rating  | 2026-01-06 12:35:55,949 - database - INFO - Loaded 1 projects from /app/data/projects.json
+auto-vote-rating  | 2026-01-06 12:35:55,949 - database - INFO - Loaded settings from /app/data/settings.json
+auto-vote-rating  | 2026-01-06 12:35:55,949 - database - INFO - Loaded statistics from /app/data/stats.json
+auto-vote-rating  | 2026-01-06 12:35:55,952 - __main__ - INFO - Starting dashboard on 0.0.0.0:8080
+auto-vote-rating  |  * Serving Flask app 'app'
+auto-vote-rating  |  * Debug mode: off
+auto-vote-rating  | 2026-01-06 12:35:55,955 - werkzeug - INFO - WARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.
+auto-vote-rating  |  * Running on all addresses (0.0.0.0)
+auto-vote-rating  |  * Running on http://127.0.0.1:8080
+auto-vote-rating  |  * Running on http://192.168.97.2:8080
+auto-vote-rating  | 2026-01-06 12:35:55,955 - werkzeug - INFO - Press CTRL+C to quit
+auto-vote-rating  | 2026-01-06 12:35:58,069 - database - INFO - Loaded 1 projects from /app/data/projects.json
+auto-vote-rating  | 2026-01-06 12:35:58,070 - werkzeug - INFO - 192.168.97.1 - - [06/Jan/2026 12:35:58] "GET /api/projects/status HTTP/1.1" 200 -
+auto-vote-rating  | 2026-01-06 12:35:58,071 - werkzeug - INFO - 192.168.97.1 - - [06/Jan/2026 12:35:58] "GET /api/logs?limit=200 HTTP/1.1" 200 -
+auto-vote-rating  | 2026-01-06 12:35:58,075 - database - INFO - Loaded 1 projects from /app/data/projects.json
+auto-vote-rating  | 2026-01-06 12:35:58,076 - werkzeug - INFO - 192.168.97.1 - - [06/Jan/2026 12:35:58] "GET /api/storage-health HTTP/1.1" 200 -
+auto-vote-rating  | Dashboard started successfully
+auto-vote-rating  | Starting voting worker...
+auto-vote-rating  | Worker PID: 16
+auto-vote-rating  | 2026-01-06 12:35:58,993 - browser_manager - INFO - Browser profiles directory: /app/data/playwright-profile
+auto-vote-rating  | 2026-01-06 12:35:58,993 - vote_handlers - INFO - Vote handler registry initialized with 2 site-specific handlers
+auto-vote-rating  | 2026-01-06 12:35:58,993 - voter - INFO - Voter initialized with automated voting support
+auto-vote-rating  | 2026-01-06 12:35:58,993 - __main__ - INFO - Starting Auto-Vote-Rating Worker
+auto-vote-rating  | 2026-01-06 12:35:58,993 - database - INFO - Loaded 1 projects from /app/data/projects.json
+auto-vote-rating  | 2026-01-06 12:35:58,993 - database - INFO - Loaded settings from /app/data/settings.json
+auto-vote-rating  | 2026-01-06 12:35:58,994 - database - INFO - Loaded statistics from /app/data/stats.json
+auto-vote-rating  | 2026-01-06 12:35:58,994 - database - INFO - Loaded 1 projects from /app/data/projects.json
+auto-vote-rating  | 2026-01-06 12:35:58,994 - __main__ - INFO - Loaded 1 projects from database
+auto-vote-rating  | 2026-01-06 12:35:58,994 - apscheduler.scheduler - INFO - Adding job tentatively -- it will be properly scheduled when the scheduler starts
+auto-vote-rating  | 2026-01-06 12:35:58,994 - apscheduler.scheduler - INFO - Added job "VoteWorker.check_and_vote" to job store "default"
+auto-vote-rating  | 2026-01-06 12:35:58,994 - apscheduler.scheduler - INFO - Scheduler started
+auto-vote-rating  | 2026-01-06 12:35:58,994 - __main__ - INFO - Scheduler started
+auto-vote-rating  | 2026-01-06 12:35:58,995 - database - INFO - Loaded 1 projects from /app/data/projects.json
+auto-vote-rating  | 2026-01-06 12:35:58,995 - database - INFO - Loaded settings from /app/data/settings.json
+auto-vote-rating  | 2026-01-06 12:35:58,995 - database - INFO - Loaded 1 projects from /app/data/projects.json
+auto-vote-rating  | 2026-01-06 12:35:58,995 - database - INFO - Loaded 1 projects from /app/data/projects.json
+auto-vote-rating  | 2026-01-06 12:35:58,995 - database - INFO - Loaded 1 projects from /app/data/projects.json
+auto-vote-rating  | 2026-01-06 12:35:58,996 - __main__ - INFO - [0] Before _process_project: cdpUrl=None, cdpBrowserActive=False
+auto-vote-rating  | 2026-01-06 12:35:58,996 - __main__ - INFO - [0] After _process_project: cdpUrl=None, cdpBrowserActive=False
+auto-vote-rating  | 2026-01-06 12:35:58,996 - __main__ - INFO - [0] About to update_project: cdpUrl=None, cdpBrowserActive=False
+auto-vote-rating  | 2026-01-06 12:35:58,996 - database - INFO - Loaded 1 projects from /app/data/projects.json
+auto-vote-rating  | 2026-01-06 12:35:58,996 - __main__ - INFO - [0] Finished update_project
+auto-vote-rating  | 2026-01-06 12:35:59,188 - werkzeug - INFO - 192.168.97.1 - - [06/Jan/2026 12:35:59] "GET / HTTP/1.1" 200 -
+auto-vote-rating  | 2026-01-06 12:35:59,230 - werkzeug - INFO - 192.168.97.1 - - [06/Jan/2026 12:35:59] "GET /css/main.css HTTP/1.1" 404 -
+auto-vote-rating  | 2026-01-06 12:35:59,231 - werkzeug - INFO - 192.168.97.1 - - [06/Jan/2026 12:35:59] "GET /css/reset.css HTTP/1.1" 404 -
+auto-vote-rating  | 2026-01-06 12:35:59,253 - werkzeug - INFO - 192.168.97.1 - - [06/Jan/2026 12:35:59] "GET /api/sites HTTP/1.1" 200 -
+auto-vote-rating  | 2026-01-06 12:35:59,256 - database - INFO - Loaded settings from /app/data/settings.json
+auto-vote-rating  | 2026-01-06 12:35:59,256 - werkzeug - INFO - 192.168.97.1 - - [06/Jan/2026 12:35:59] "GET /api/settings HTTP/1.1" 200 -
+auto-vote-rating  | 2026-01-06 12:35:59,256 - database - INFO - Loaded statistics from /app/data/stats.json
+auto-vote-rating  | 2026-01-06 12:35:59,256 - werkzeug - INFO - 192.168.97.1 - - [06/Jan/2026 12:35:59] "GET /api/stats HTTP/1.1" 200 -
+auto-vote-rating  | 2026-01-06 12:35:59,277 - database - INFO - Loaded 1 projects from /app/data/projects.json
+auto-vote-rating  | 2026-01-06 12:35:59,278 - werkzeug - INFO - 192.168.97.1 - - [06/Jan/2026 12:35:59] "GET /api/projects HTTP/1.1" 200 -
+auto-vote-rating  | 2026-01-06 12:35:59,287 - werkzeug - INFO - 192.168.97.1 - - [06/Jan/2026 12:35:59] "GET /api/logs?limit=200 HTTP/1.1" 200 -
+auto-vote-rating  | 2026-01-06 12:35:59,288 - database - INFO - Loaded 1 projects from /app/data/projects.json
+auto-vote-rating  | 2026-01-06 12:35:59,288 - database - INFO - Loaded 1 projects from /app/data/projects.json
+auto-vote-rating  | 2026-01-06 12:35:59,288 - werkzeug - INFO - 192.168.97.1 - - [06/Jan/2026 12:35:59] "GET /api/projects/status HTTP/1.1" 200 -
+auto-vote-rating  | 2026-01-06 12:35:59,288 - werkzeug - INFO - 192.168.97.1 - - [06/Jan/2026 12:35:59] "GET /api/storage-health HTTP/1.1" 200 -
+auto-vote-rating  | 2026-01-06 12:35:59,791 - werkzeug - INFO - 192.168.97.1 - - [06/Jan/2026 12:35:59] "GET / HTTP/1.1" 200 -
+auto-vote-rating  | 2026-01-06 12:35:59,843 - werkzeug - INFO - 192.168.97.1 - - [06/Jan/2026 12:35:59] "GET /css/reset.css HTTP/1.1" 404 -
+auto-vote-rating  | 2026-01-06 12:35:59,844 - werkzeug - INFO - 192.168.97.1 - - [06/Jan/2026 12:35:59] "GET /css/main.css HTTP/1.1" 404 -
+auto-vote-rating  | 2026-01-06 12:35:59,865 - werkzeug - INFO - 192.168.97.1 - - [06/Jan/2026 12:35:59] "GET /api/sites HTTP/1.1" 200 -
+auto-vote-rating  | 2026-01-06 12:35:59,866 - database - INFO - Loaded settings from /app/data/settings.json
+auto-vote-rating  | 2026-01-06 12:35:59,866 - werkzeug - INFO - 192.168.97.1 - - [06/Jan/2026 12:35:59] "GET /api/settings HTTP/1.1" 200 -
+auto-vote-rating  | 2026-01-06 12:35:59,871 - database - INFO - Loaded statistics from /app/data/stats.json
+auto-vote-rating  | 2026-01-06 12:35:59,871 - werkzeug - INFO - 192.168.97.1 - - [06/Jan/2026 12:35:59] "GET /api/stats HTTP/1.1" 200 -
+auto-vote-rating  | 2026-01-06 12:35:59,877 - database - INFO - Loaded 1 projects from /app/data/projects.json
+auto-vote-rating  | 2026-01-06 12:35:59,878 - werkzeug - INFO - 192.168.97.1 - - [06/Jan/2026 12:35:59] "GET /api/projects HTTP/1.1" 200 -
+auto-vote-rating  | 2026-01-06 12:35:59,894 - database - INFO - Loaded 1 projects from /app/data/projects.json
+auto-vote-rating  | 2026-01-06 12:35:59,894 - database - INFO - Loaded 1 projects from /app/data/projects.json
+auto-vote-rating  | 2026-01-06 12:35:59,895 - werkzeug - INFO - 192.168.97.1 - - [06/Jan/2026 12:35:59] "GET /api/projects/status HTTP/1.1" 200 -
+auto-vote-rating  | 2026-01-06 12:35:59,896 - werkzeug - INFO - 192.168.97.1 - - [06/Jan/2026 12:35:59] "GET /api/logs?limit=200 HTTP/1.1" 200 -
+auto-vote-rating  | 2026-01-06 12:35:59,897 - werkzeug - INFO - 192.168.97.1 - - [06/Jan/2026 12:35:59] "GET /api/storage-health HTTP/1.1" 200 -
+auto-vote-rating  | 2026-01-06 12:36:00,370 - werkzeug - INFO - 192.168.97.1 - - [06/Jan/2026 12:36:00] "GET / HTTP/1.1" 200 -
+auto-vote-rating  | 2026-01-06 12:36:00,412 - werkzeug - INFO - 192.168.97.1 - - [06/Jan/2026 12:36:00] "GET /css/main.css HTTP/1.1" 404 -
+auto-vote-rating  | 2026-01-06 12:36:00,413 - werkzeug - INFO - 192.168.97.1 - - [06/Jan/2026 12:36:00] "GET /css/reset.css HTTP/1.1" 404 -
+auto-vote-rating  | 2026-01-06 12:36:00,428 - werkzeug - INFO - 192.168.97.1 - - [06/Jan/2026 12:36:00] "GET /api/sites HTTP/1.1" 200 -
+auto-vote-rating  | 2026-01-06 12:36:00,429 - database - INFO - Loaded settings from /app/data/settings.json
+auto-vote-rating  | 2026-01-06 12:36:00,429 - werkzeug - INFO - 192.168.97.1 - - [06/Jan/2026 12:36:00] "GET /api/settings HTTP/1.1" 200 -
+auto-vote-rating  | 2026-01-06 12:36:00,429 - database - INFO - Loaded statistics from /app/data/stats.json
+auto-vote-rating  | 2026-01-06 12:36:00,429 - werkzeug - INFO - 192.168.97.1 - - [06/Jan/2026 12:36:00] "GET /api/stats HTTP/1.1" 200 -
+auto-vote-rating  | 2026-01-06 12:36:00,448 - database - INFO - Loaded 1 projects from /app/data/projects.json
+auto-vote-rating  | 2026-01-06 12:36:00,448 - werkzeug - INFO - 192.168.97.1 - - [06/Jan/2026 12:36:00] "GET /api/projects HTTP/1.1" 200 -
+auto-vote-rating  | 2026-01-06 12:36:00,463 - werkzeug - INFO - 192.168.97.1 - - [06/Jan/2026 12:36:00] "GET /api/logs?limit=200 HTTP/1.1" 200 -
+auto-vote-rating  | 2026-01-06 12:36:00,463 - database - INFO - Loaded 1 projects from /app/data/projects.json
+auto-vote-rating  | 2026-01-06 12:36:00,463 - database - INFO - Loaded 1 projects from /app/data/projects.json
+auto-vote-rating  | 2026-01-06 12:36:00,464 - werkzeug - INFO - 192.168.97.1 - - [06/Jan/2026 12:36:00] "GET /api/projects/status HTTP/1.1" 200 -
+auto-vote-rating  | 2026-01-06 12:36:00,464 - werkzeug - INFO - 192.168.97.1 - - [06/Jan/2026 12:36:00] "GET /api/storage-health HTTP/1.1" 200 -
+auto-vote-rating  | ==========================================
+auto-vote-rating  | Auto-Vote-Rating started successfully!
+auto-vote-rating  | Dashboard: http://localhost:8080
+auto-vote-rating  | ==========================================
+auto-vote-rating  | 2026-01-06 12:36:00,874 - database - INFO - Loaded settings from /app/data/settings.json
+auto-vote-rating  | 2026-01-06 12:36:00,874 - werkzeug - INFO - 127.0.0.1 - - [06/Jan/2026 12:36:00] "GET /health HTTP/1.1" 200 -
+auto-vote-rating  | 2026-01-06 12:36:05,442 - werkzeug - INFO - 192.168.97.1 - - [06/Jan/2026 12:36:05] "GET / HTTP/1.1" 200 -
+auto-vote-rating  | 2026-01-06 12:36:05,443 - database - INFO - Loaded 1 projects from /app/data/projects.json
+auto-vote-rating  | 2026-01-06 12:36:05,444 - werkzeug - INFO - 192.168.97.1 - - [06/Jan/2026 12:36:05] "GET /api/storage-health HTTP/1.1" 200 -
+auto-vote-rating  | 2026-01-06 12:36:05,445 - database - INFO - Loaded 1 projects from /app/data/projects.json
+auto-vote-rating  | 2026-01-06 12:36:05,445 - werkzeug - INFO - 192.168.97.1 - - [06/Jan/2026 12:36:05] "GET /api/projects/status HTTP/1.1" 200 -
+auto-vote-rating  | 2026-01-06 12:36:05,449 - werkzeug - INFO - 192.168.97.1 - - [06/Jan/2026 12:36:05] "GET /api/logs?limit=200 HTTP/1.1" 200 -
+auto-vote-rating  | 2026-01-06 12:36:05,472 - werkzeug - INFO - 192.168.97.1 - - [06/Jan/2026 12:36:05] "GET /css/reset.css HTTP/1.1" 404 -
+auto-vote-rating  | 2026-01-06 12:36:05,473 - werkzeug - INFO - 192.168.97.1 - - [06/Jan/2026 12:36:05] "GET /css/main.css HTTP/1.1" 404 -
+auto-vote-rating  | 2026-01-06 12:36:05,490 - werkzeug - INFO - 192.168.97.1 - - [06/Jan/2026 12:36:05] "GET /api/sites HTTP/1.1" 200 -
+auto-vote-rating  | 2026-01-06 12:36:05,492 - database - INFO - Loaded settings from /app/data/settings.json
+auto-vote-rating  | 2026-01-06 12:36:05,492 - werkzeug - INFO - 192.168.97.1 - - [06/Jan/2026 12:36:05] "GET /api/settings HTTP/1.1" 200 -
+auto-vote-rating  | 2026-01-06 12:36:05,494 - database - INFO - Loaded statistics from /app/data/stats.json
+auto-vote-rating  | 2026-01-06 12:36:05,494 - werkzeug - INFO - 192.168.97.1 - - [06/Jan/2026 12:36:05] "GET /api/stats HTTP/1.1" 200 -
+auto-vote-rating  | 2026-01-06 12:36:05,503 - werkzeug - INFO - 192.168.97.1 - - [06/Jan/2026 12:36:05] "GET /favicon.ico HTTP/1.1" 404 -
+auto-vote-rating  | 2026-01-06 12:36:05,505 - database - INFO - Loaded 1 projects from /app/data/projects.json
+auto-vote-rating  | 2026-01-06 12:36:05,505 - werkzeug - INFO - 192.168.97.1 - - [06/Jan/2026 12:36:05] "GET /api/projects HTTP/1.1" 200 -
+auto-vote-rating  | 2026-01-06 12:36:05,521 - database - INFO - Loaded 1 projects from /app/data/projects.json
+auto-vote-rating  | 2026-01-06 12:36:05,525 - werkzeug - INFO - 192.168.97.1 - - [06/Jan/2026 12:36:05] "GET /api/logs?limit=200 HTTP/1.1" 200 -
+auto-vote-rating  | 2026-01-06 12:36:05,526 - werkzeug - INFO - 192.168.97.1 - - [06/Jan/2026 12:36:05] "GET /api/storage-health HTTP/1.1" 200 -
+auto-vote-rating  | 2026-01-06 12:36:05,526 - database - INFO - Loaded 1 projects from /app/data/projects.json
+auto-vote-rating  | 2026-01-06 12:36:05,527 - werkzeug - INFO - 192.168.97.1 - - [06/Jan/2026 12:36:05] "GET /api/projects/status HTTP/1.1" 200 -
+auto-vote-rating  | 2026-01-06 12:36:06,013 - werkzeug - INFO - 192.168.97.1 - - [06/Jan/2026 12:36:06] "GET / HTTP/1.1" 200 -
+auto-vote-rating  | 2026-01-06 12:36:06,034 - werkzeug - INFO - 192.168.97.1 - - [06/Jan/2026 12:36:06] "GET /css/main.css HTTP/1.1" 404 -
+auto-vote-rating  | 2026-01-06 12:36:06,035 - werkzeug - INFO - 192.168.97.1 - - [06/Jan/2026 12:36:06] "GET /css/reset.css HTTP/1.1" 404 -
+auto-vote-rating  | 2026-01-06 12:36:06,043 - werkzeug - INFO - 192.168.97.1 - - [06/Jan/2026 12:36:06] "GET /api/sites HTTP/1.1" 200 -
+auto-vote-rating  | 2026-01-06 12:36:06,045 - database - INFO - Loaded settings from /app/data/settings.json
+auto-vote-rating  | 2026-01-06 12:36:06,045 - database - INFO - Loaded statistics from /app/data/stats.json
+auto-vote-rating  | 2026-01-06 12:36:06,045 - werkzeug - INFO - 192.168.97.1 - - [06/Jan/2026 12:36:06] "GET /api/settings HTTP/1.1" 200 -
+auto-vote-rating  | 2026-01-06 12:36:06,045 - werkzeug - INFO - 192.168.97.1 - - [06/Jan/2026 12:36:06] "GET /api/stats HTTP/1.1" 200 -
+auto-vote-rating  | 2026-01-06 12:36:06,055 - werkzeug - INFO - 192.168.97.1 - - [06/Jan/2026 12:36:06] "GET /favicon.ico HTTP/1.1" 404 -
+auto-vote-rating  | 2026-01-06 12:36:06,056 - database - INFO - Loaded 1 projects from /app/data/projects.json
+auto-vote-rating  | 2026-01-06 12:36:06,057 - werkzeug - INFO - 192.168.97.1 - - [06/Jan/2026 12:36:06] "GET /api/projects HTTP/1.1" 200 -
+auto-vote-rating  | 2026-01-06 12:36:06,064 - database - INFO - Loaded 1 projects from /app/data/projects.json
+auto-vote-rating  | 2026-01-06 12:36:06,064 - werkzeug - INFO - 192.168.97.1 - - [06/Jan/2026 12:36:06] "GET /api/storage-health HTTP/1.1" 200 -
+auto-vote-rating  | 2026-01-06 12:36:06,064 - database - INFO - Loaded 1 projects from /app/data/projects.json
+auto-vote-rating  | 2026-01-06 12:36:06,068 - werkzeug - INFO - 192.168.97.1 - - [06/Jan/2026 12:36:06] "GET /api/projects/status HTTP/1.1" 200 -
+auto-vote-rating  | 2026-01-06 12:36:06,067 - werkzeug - INFO - 192.168.97.1 - - [06/Jan/2026 12:36:06] "GET /api/logs?limit=200 HTTP/1.1" 200 -
+auto-vote-rating  | 2026-01-06 12:36:08,449 - database - INFO - Loaded 1 projects from /app/data/projects.json
+auto-vote-rating  | 2026-01-06 12:36:08,452 - werkzeug - INFO - 192.168.97.1 - - [06/Jan/2026 12:36:08] "POST /api/projects/0/vote-now HTTP/1.1" 200 -
+auto-vote-rating  | 2026-01-06 12:36:11,052 - database - INFO - Loaded 1 projects from /app/data/projects.json
+auto-vote-rating  | 2026-01-06 12:36:11,053 - werkzeug - INFO - 192.168.97.1 - - [06/Jan/2026 12:36:11] "GET /api/projects/status HTTP/1.1" 200 -
+auto-vote-rating  | 2026-01-06 12:36:11,053 - database - INFO - Loaded 1 projects from /app/data/projects.json
+auto-vote-rating  | 2026-01-06 12:36:11,057 - werkzeug - INFO - 192.168.97.1 - - [06/Jan/2026 12:36:11] "GET /api/storage-health HTTP/1.1" 200 -
+auto-vote-rating  | 2026-01-06 12:36:11,063 - werkzeug - INFO - 192.168.97.1 - - [06/Jan/2026 12:36:11] "GET /api/logs?limit=200 HTTP/1.1" 200 -
+auto-vote-rating  | 2026-01-06 12:36:16,054 - database - INFO - Loaded 1 projects from /app/data/projects.json
+auto-vote-rating  | 2026-01-06 12:36:16,058 - werkzeug - INFO - 192.168.97.1 - - [06/Jan/2026 12:36:16] "GET /api/logs?limit=200 HTTP/1.1" 200 -
+auto-vote-rating  | 2026-01-06 12:36:16,058 - werkzeug - INFO - 192.168.97.1 - - [06/Jan/2026 12:36:16] "GET /api/storage-health HTTP/1.1" 200 -
+auto-vote-rating  | 2026-01-06 12:36:16,059 - database - INFO - Loaded 1 projects from /app/data/projects.json
+auto-vote-rating  | 2026-01-06 12:36:16,060 - werkzeug - INFO - 192.168.97.1 - - [06/Jan/2026 12:36:16] "GET /api/projects/status HTTP/1.1" 200 -
+auto-vote-rating  | 2026-01-06 12:36:21,046 - database - INFO - Loaded 1 projects from /app/data/projects.json
+auto-vote-rating  | 2026-01-06 12:36:21,047 - werkzeug - INFO - 192.168.97.1 - - [06/Jan/2026 12:36:21] "GET /api/storage-health HTTP/1.1" 200 -
+auto-vote-rating  | 2026-01-06 12:36:21,048 - database - INFO - Loaded 1 projects from /app/data/projects.json
+auto-vote-rating  | 2026-01-06 12:36:21,048 - werkzeug - INFO - 192.168.97.1 - - [06/Jan/2026 12:36:21] "GET /api/projects/status HTTP/1.1" 200 -
+auto-vote-rating  | 2026-01-06 12:36:21,051 - werkzeug - INFO - 192.168.97.1 - - [06/Jan/2026 12:36:21] "GET /api/logs?limit=200 HTTP/1.1" 200 -
+auto-vote-rating  | 2026-01-06 12:36:26,048 - database - INFO - Loaded 1 projects from /app/data/projects.json
+auto-vote-rating  | 2026-01-06 12:36:26,048 - werkzeug - INFO - 192.168.97.1 - - [06/Jan/2026 12:36:26] "GET /api/storage-health HTTP/1.1" 200 -
+auto-vote-rating  | 2026-01-06 12:36:26,052 - database - INFO - Loaded 1 projects from /app/data/projects.json
+auto-vote-rating  | 2026-01-06 12:36:26,054 - werkzeug - INFO - 192.168.97.1 - - [06/Jan/2026 12:36:26] "GET /api/logs?limit=200 HTTP/1.1" 200 -
+auto-vote-rating  | 2026-01-06 12:36:26,055 - werkzeug - INFO - 192.168.97.1 - - [06/Jan/2026 12:36:26] "GET /api/projects/status HTTP/1.1" 200 -
+auto-vote-rating  | 2026-01-06 12:36:30,946 - database - INFO - Loaded settings from /app/data/settings.json
+auto-vote-rating  | 2026-01-06 12:36:30,947 - werkzeug - INFO - 127.0.0.1 - - [06/Jan/2026 12:36:30] "GET /health HTTP/1.1" 200 -
+auto-vote-rating  | 2026-01-06 12:36:31,048 - database - INFO - Loaded 1 projects from /app/data/projects.json
+auto-vote-rating  | 2026-01-06 12:36:31,049 - werkzeug - INFO - 192.168.97.1 - - [06/Jan/2026 12:36:31] "GET /api/projects/status HTTP/1.1" 200 -
+auto-vote-rating  | 2026-01-06 12:36:31,051 - werkzeug - INFO - 192.168.97.1 - - [06/Jan/2026 12:36:31] "GET /api/logs?limit=200 HTTP/1.1" 200 -
+auto-vote-rating  | 2026-01-06 12:36:31,052 - database - INFO - Loaded 1 projects from /app/data/projects.json
+auto-vote-rating  | 2026-01-06 12:36:31,052 - werkzeug - INFO - 192.168.97.1 - - [06/Jan/2026 12:36:31] "GET /api/storage-health HTTP/1.1" 200 -
+auto-vote-rating  | 2026-01-06 12:36:36,053 - database - INFO - Loaded 1 projects from /app/data/projects.json
+auto-vote-rating  | 2026-01-06 12:36:36,054 - werkzeug - INFO - 192.168.97.1 - - [06/Jan/2026 12:36:36] "GET /api/projects/status HTTP/1.1" 200 -
+auto-vote-rating  | 2026-01-06 12:36:36,058 - database - INFO - Loaded 1 projects from /app/data/projects.json
+auto-vote-rating  | 2026-01-06 12:36:36,059 - werkzeug - INFO - 192.168.97.1 - - [06/Jan/2026 12:36:36] "GET /api/logs?limit=200 HTTP/1.1" 200 -
+auto-vote-rating  | 2026-01-06 12:36:36,059 - werkzeug - INFO - 192.168.97.1 - - [06/Jan/2026 12:36:36] "GET /api/storage-health HTTP/1.1" 200 -
+auto-vote-rating  | 2026-01-06 12:36:41,052 - database - INFO - Loaded 1 projects from /app/data/projects.json
+auto-vote-rating  | 2026-01-06 12:36:41,052 - werkzeug - INFO - 192.168.97.1 - - [06/Jan/2026 12:36:41] "GET /api/storage-health HTTP/1.1" 200 -
+auto-vote-rating  | 2026-01-06 12:36:41,053 - database - INFO - Loaded 1 projects from /app/data/projects.json
+auto-vote-rating  | 2026-01-06 12:36:41,053 - werkzeug - INFO - 192.168.97.1 - - [06/Jan/2026 12:36:41] "GET /api/projects/status HTTP/1.1" 200 -
+auto-vote-rating  | 2026-01-06 12:36:41,062 - werkzeug - INFO - 192.168.97.1 - - [06/Jan/2026 12:36:41] "GET /api/logs?limit=200 HTTP/1.1" 200 -
+auto-vote-rating  | 2026-01-06 12:36:46,050 - database - INFO - Loaded 1 projects from /app/data/projects.json
+auto-vote-rating  | 2026-01-06 12:36:46,050 - database - INFO - Loaded 1 projects from /app/data/projects.json
+auto-vote-rating  | 2026-01-06 12:36:46,054 - werkzeug - INFO - 192.168.97.1 - - [06/Jan/2026 12:36:46] "GET /api/storage-health HTTP/1.1" 200 -
+auto-vote-rating  | 2026-01-06 12:36:46,051 - werkzeug - INFO - 192.168.97.1 - - [06/Jan/2026 12:36:46] "GET /api/projects/status HTTP/1.1" 200 -
+auto-vote-rating  | 2026-01-06 12:36:46,056 - werkzeug - INFO - 192.168.97.1 - - [06/Jan/2026 12:36:46] "GET /api/logs?limit=200 HTTP/1.1" 200 -
+auto-vote-rating  | 2026-01-06 12:36:51,055 - database - INFO - Loaded 1 projects from /app/data/projects.json
+auto-vote-rating  | 2026-01-06 12:36:51,056 - werkzeug - INFO - 192.168.97.1 - - [06/Jan/2026 12:36:51] "GET /api/logs?limit=200 HTTP/1.1" 200 -
+auto-vote-rating  | 2026-01-06 12:36:51,056 - database - INFO - Loaded 1 projects from /app/data/projects.json
+auto-vote-rating  | 2026-01-06 12:36:51,057 - werkzeug - INFO - 192.168.97.1 - - [06/Jan/2026 12:36:51] "GET /api/storage-health HTTP/1.1" 200 -
+auto-vote-rating  | 2026-01-06 12:36:51,058 - werkzeug - INFO - 192.168.97.1 - - [06/Jan/2026 12:36:51] "GET /api/projects/status HTTP/1.1" 200 -
+auto-vote-rating  | 2026-01-06 12:36:56,056 - werkzeug - INFO - 192.168.97.1 - - [06/Jan/2026 12:36:56] "GET /api/logs?limit=200 HTTP/1.1" 200 -
+auto-vote-rating  | 2026-01-06 12:36:56,057 - database - INFO - Loaded 1 projects from /app/data/projects.json
+auto-vote-rating  | 2026-01-06 12:36:56,057 - database - INFO - Loaded 1 projects from /app/data/projects.json
+auto-vote-rating  | 2026-01-06 12:36:56,057 - werkzeug - INFO - 192.168.97.1 - - [06/Jan/2026 12:36:56] "GET /api/projects/status HTTP/1.1" 200 -
+auto-vote-rating  | 2026-01-06 12:36:56,060 - werkzeug - INFO - 192.168.97.1 - - [06/Jan/2026 12:36:56] "GET /api/storage-health HTTP/1.1" 200 -
+auto-vote-rating  | 2026-01-06 12:36:59,008 - apscheduler.executors.default - INFO - Running job "VoteWorker.check_and_vote (trigger: interval[0:01:00], next run at: 2026-01-06 12:37:58 UTC)" (scheduled at 2026-01-06 12:36:58.994343+00:00)
+auto-vote-rating  | 2026-01-06 12:36:59,012 - database - INFO - Loaded 1 projects from /app/data/projects.json
+auto-vote-rating  | 2026-01-06 12:36:59,014 - database - INFO - Loaded settings from /app/data/settings.json
+auto-vote-rating  | 2026-01-06 12:36:59,016 - database - INFO - Loaded 1 projects from /app/data/projects.json
+auto-vote-rating  | 2026-01-06 12:36:59,017 - database - INFO - Loaded 1 projects from /app/data/projects.json
+auto-vote-rating  | 2026-01-06 12:36:59,017 - database - INFO - Loaded 1 projects from /app/data/projects.json
+auto-vote-rating  | 2026-01-06 12:36:59,017 - __main__ - INFO - [0] Before _process_project: cdpUrl=None, cdpBrowserActive=False
+auto-vote-rating  | 2026-01-06 12:36:59,017 - database - INFO - Loaded 1 projects from /app/data/projects.json
+auto-vote-rating  | 2026-01-06 12:36:59,019 - voter - INFO - [0] Starting vote attempt for minecraft-server.eu
+auto-vote-rating  | 2026-01-06 12:36:59,204 - browser_manager - INFO - Playwright initialized
+auto-vote-rating  | 2026-01-06 12:36:59,204 - browser_manager - INFO - [0] Creating persistent browser context
+auto-vote-rating  | 2026-01-06 12:36:59,204 - browser_manager - INFO - [0] Profile path: /app/data/playwright-profile/0
+auto-vote-rating  | 2026-01-06 12:36:59,446 - browser_manager - INFO - [0] Profile size: 53.39 MB
+auto-vote-rating  | 2026-01-06 12:36:59,462 - voter - INFO - [0] Navigating to https://minecraft-server.eu/vote/index/208F7/
+auto-vote-rating  | 2026-01-06 12:37:00,975 - database - INFO - Loaded settings from /app/data/settings.json
+auto-vote-rating  | 2026-01-06 12:37:00,975 - werkzeug - INFO - 127.0.0.1 - - [06/Jan/2026 12:37:00] "GET /health HTTP/1.1" 200 -
+auto-vote-rating  | 2026-01-06 12:37:01,051 - database - INFO - Loaded 1 projects from /app/data/projects.json
+auto-vote-rating  | 2026-01-06 12:37:01,051 - werkzeug - INFO - 192.168.97.1 - - [06/Jan/2026 12:37:01] "GET /api/projects/status HTTP/1.1" 200 -
+auto-vote-rating  | 2026-01-06 12:37:01,054 - werkzeug - INFO - 192.168.97.1 - - [06/Jan/2026 12:37:01] "GET /api/logs?limit=200 HTTP/1.1" 200 -
+auto-vote-rating  | 2026-01-06 12:37:01,055 - database - INFO - Loaded 1 projects from /app/data/projects.json
+auto-vote-rating  | 2026-01-06 12:37:01,055 - werkzeug - INFO - 192.168.97.1 - - [06/Jan/2026 12:37:01] "GET /api/storage-health HTTP/1.1" 200 -
+auto-vote-rating  | 2026-01-06 12:37:03,104 - voter - INFO - [0] Page loaded: https://minecraft-server.eu/vote/index/208F7/
+auto-vote-rating  | 2026-01-06 12:37:03,113 - voter - INFO - [0] Page title: >Vote for ⭐ MixelPixel.net ❤️ CityBuild ❤️ IP ⇨ Play.MixelPixel.net ⭐ » 1.21.8 « ✅
+auto-vote-rating  | 2026-01-06 12:37:04,160 - voter - INFO - [0] Attempting automated vote with site: minecraft-server.eu
+auto-vote-rating  | 2026-01-06 12:37:04,160 - voter - INFO - [0] Using handler: MinecraftServerEUHandler
+auto-vote-rating  | 2026-01-06 12:37:04,160 - vote_handlers - INFO - [minecraft-server.eu] Attempting vote for 0
+auto-vote-rating  | 2026-01-06 12:37:04,160 - vote_handlers - INFO - [minecraft-server.eu] Checking for dialogs/consent...
+auto-vote-rating  | 2026-01-06 12:37:04,160 - vote_handlers - INFO - Checking for cookie consent dialogs...
+auto-vote-rating  | 2026-01-06 12:37:04,170 - vote_handlers - INFO - Found cookie consent button: div[role="dialog"] button
+auto-vote-rating  | 2026-01-06 12:37:05,668 - vote_handlers - INFO - Cookie consent dismissed
+auto-vote-rating  | 2026-01-06 12:37:06,051 - database - INFO - Loaded 1 projects from /app/data/projects.json
+auto-vote-rating  | 2026-01-06 12:37:06,053 - werkzeug - INFO - 192.168.97.1 - - [06/Jan/2026 12:37:06] "GET /api/storage-health HTTP/1.1" 200 -
+auto-vote-rating  | 2026-01-06 12:37:06,054 - werkzeug - INFO - 192.168.97.1 - - [06/Jan/2026 12:37:06] "GET /api/logs?limit=200 HTTP/1.1" 200 -
+auto-vote-rating  | 2026-01-06 12:37:06,055 - database - INFO - Loaded 1 projects from /app/data/projects.json
+auto-vote-rating  | 2026-01-06 12:37:06,055 - werkzeug - INFO - 192.168.97.1 - - [06/Jan/2026 12:37:06] "GET /api/projects/status HTTP/1.1" 200 -
+auto-vote-rating  | 2026-01-06 12:37:07,693 - vote_handlers - INFO - [minecraft-server.eu] Polling for vote button...
+auto-vote-rating  | 2026-01-06 12:37:07,694 - vote_handlers - INFO - Polling for vote button (up to 12s)...
+auto-vote-rating  | 2026-01-06 12:37:11,049 - database - INFO - Loaded 1 projects from /app/data/projects.json
+auto-vote-rating  | 2026-01-06 12:37:11,049 - werkzeug - INFO - 192.168.97.1 - - [06/Jan/2026 12:37:11] "GET /api/storage-health HTTP/1.1" 200 -
+auto-vote-rating  | 2026-01-06 12:37:11,049 - database - INFO - Loaded 1 projects from /app/data/projects.json
+auto-vote-rating  | 2026-01-06 12:37:11,051 - werkzeug - INFO - 192.168.97.1 - - [06/Jan/2026 12:37:11] "GET /api/projects/status HTTP/1.1" 200 -
+auto-vote-rating  | 2026-01-06 12:37:11,050 - werkzeug - INFO - 192.168.97.1 - - [06/Jan/2026 12:37:11] "GET /api/logs?limit=200 HTTP/1.1" 200 -
+auto-vote-rating  | 2026-01-06 12:37:14,727 - vote_handlers - INFO - Vote button found after 0s: button:has-text("Vote")
+auto-vote-rating  | 2026-01-06 12:37:16,054 - werkzeug - INFO - 192.168.97.1 - - [06/Jan/2026 12:37:16] "GET /api/logs?limit=200 HTTP/1.1" 200 -
+auto-vote-rating  | 2026-01-06 12:37:16,054 - database - INFO - Loaded 1 projects from /app/data/projects.json
+auto-vote-rating  | 2026-01-06 12:37:16,055 - database - INFO - Loaded 1 projects from /app/data/projects.json
+auto-vote-rating  | 2026-01-06 12:37:16,055 - werkzeug - INFO - 192.168.97.1 - - [06/Jan/2026 12:37:16] "GET /api/storage-health HTTP/1.1" 200 -
+auto-vote-rating  | 2026-01-06 12:37:16,055 - werkzeug - INFO - 192.168.97.1 - - [06/Jan/2026 12:37:16] "GET /api/projects/status HTTP/1.1" 200 -
+auto-vote-rating  | 2026-01-06 12:37:21,054 - database - INFO - Loaded 1 projects from /app/data/projects.json
+auto-vote-rating  | 2026-01-06 12:37:21,056 - werkzeug - INFO - 192.168.97.1 - - [06/Jan/2026 12:37:21] "GET /api/storage-health HTTP/1.1" 200 -
+auto-vote-rating  | 2026-01-06 12:37:21,056 - database - INFO - Loaded 1 projects from /app/data/projects.json
+auto-vote-rating  | 2026-01-06 12:37:21,059 - werkzeug - INFO - 192.168.97.1 - - [06/Jan/2026 12:37:21] "GET /api/projects/status HTTP/1.1" 200 -
+auto-vote-rating  | 2026-01-06 12:37:21,059 - werkzeug - INFO - 192.168.97.1 - - [06/Jan/2026 12:37:21] "GET /api/logs?limit=200 HTTP/1.1" 200 -
+auto-vote-rating  | 2026-01-06 12:37:26,045 - database - INFO - Loaded 1 projects from /app/data/projects.json
+auto-vote-rating  | 2026-01-06 12:37:26,046 - werkzeug - INFO - 192.168.97.1 - - [06/Jan/2026 12:37:26] "GET /api/projects/status HTTP/1.1" 200 -
+auto-vote-rating  | 2026-01-06 12:37:26,049 - werkzeug - INFO - 192.168.97.1 - - [06/Jan/2026 12:37:26] "GET /api/logs?limit=200 HTTP/1.1" 200 -
+auto-vote-rating  | 2026-01-06 12:37:26,049 - database - INFO - Loaded 1 projects from /app/data/projects.json
+auto-vote-rating  | 2026-01-06 12:37:26,049 - werkzeug - INFO - 192.168.97.1 - - [06/Jan/2026 12:37:26] "GET /api/storage-health HTTP/1.1" 200 -
+auto-vote-rating  | 2026-01-06 12:37:31,032 - database - INFO - Loaded settings from /app/data/settings.json
+auto-vote-rating  | 2026-01-06 12:37:31,032 - werkzeug - INFO - 127.0.0.1 - - [06/Jan/2026 12:37:31] "GET /health HTTP/1.1" 200 -
+auto-vote-rating  | 2026-01-06 12:37:31,045 - database - INFO - Loaded 1 projects from /app/data/projects.json
+auto-vote-rating  | 2026-01-06 12:37:31,045 - werkzeug - INFO - 192.168.97.1 - - [06/Jan/2026 12:37:31] "GET /api/projects/status HTTP/1.1" 200 -
+auto-vote-rating  | 2026-01-06 12:37:31,047 - werkzeug - INFO - 192.168.97.1 - - [06/Jan/2026 12:37:31] "GET /api/logs?limit=200 HTTP/1.1" 200 -
+auto-vote-rating  | 2026-01-06 12:37:31,047 - database - INFO - Loaded 1 projects from /app/data/projects.json
+auto-vote-rating  | 2026-01-06 12:37:31,048 - werkzeug - INFO - 192.168.97.1 - - [06/Jan/2026 12:37:31] "GET /api/storage-health HTTP/1.1" 200 -
+auto-vote-rating  | 2026-01-06 12:37:36,050 - database - INFO - Loaded 1 projects from /app/data/projects.json
+auto-vote-rating  | 2026-01-06 12:37:36,051 - werkzeug - INFO - 192.168.97.1 - - [06/Jan/2026 12:37:36] "GET /api/projects/status HTTP/1.1" 200 -
+auto-vote-rating  | 2026-01-06 12:37:36,052 - werkzeug - INFO - 192.168.97.1 - - [06/Jan/2026 12:37:36] "GET /api/logs?limit=200 HTTP/1.1" 200 -
+auto-vote-rating  | 2026-01-06 12:37:36,052 - database - INFO - Loaded 1 projects from /app/data/projects.json
+auto-vote-rating  | 2026-01-06 12:37:36,052 - werkzeug - INFO - 192.168.97.1 - - [06/Jan/2026 12:37:36] "GET /api/storage-health HTTP/1.1" 200 -
+auto-vote-rating  | 2026-01-06 12:37:41,048 - database - INFO - Loaded 1 projects from /app/data/projects.json
+auto-vote-rating  | 2026-01-06 12:37:41,051 - werkzeug - INFO - 192.168.97.1 - - [06/Jan/2026 12:37:41] "GET /api/logs?limit=200 HTTP/1.1" 200 -
+auto-vote-rating  | 2026-01-06 12:37:41,051 - werkzeug - INFO - 192.168.97.1 - - [06/Jan/2026 12:37:41] "GET /api/projects/status HTTP/1.1" 200 -
+auto-vote-rating  | 2026-01-06 12:37:41,052 - database - INFO - Loaded 1 projects from /app/data/projects.json
+auto-vote-rating  | 2026-01-06 12:37:41,053 - werkzeug - INFO - 192.168.97.1 - - [06/Jan/2026 12:37:41] "GET /api/storage-health HTTP/1.1" 200 -
+auto-vote-rating  | 2026-01-06 12:37:45,253 - vote_handlers - ERROR - [minecraft-server.eu] Error clicking vote button: Timeout 30000ms exceeded.
+auto-vote-rating  | 2026-01-06 12:37:45,253 - voter - WARNING - [0] Could not find vote button
+auto-vote-rating  | 2026-01-06 12:37:45,276 - __main__ - INFO - [0] After _process_project: cdpUrl=None, cdpBrowserActive=False
+auto-vote-rating  | 2026-01-06 12:37:45,276 - __main__ - INFO - [0] About to update_project: cdpUrl=None, cdpBrowserActive=False
+auto-vote-rating  | 2026-01-06 12:37:45,277 - database - INFO - Loaded 1 projects from /app/data/projects.json
+auto-vote-rating  | 2026-01-06 12:37:45,278 - __main__ - INFO - [0] Finished update_project
+auto-vote-rating  | 2026-01-06 12:37:45,278 - apscheduler.executors.default - INFO - Job "VoteWorker.check_and_vote (trigger: interval[0:01:00], next run at: 2026-01-06 12:37:58 UTC)" executed successfully
+auto-vote-rating  | 2026-01-06 12:37:46,054 - werkzeug - INFO - 192.168.97.1 - - [06/Jan/2026 12:37:46] "GET /api/logs?limit=200 HTTP/1.1" 200 -
+auto-vote-rating  | 2026-01-06 12:37:46,055 - database - INFO - Loaded 1 projects from /app/data/projects.json
+auto-vote-rating  | 2026-01-06 12:37:46,055 - database - INFO - Loaded 1 projects from /app/data/projects.json
+auto-vote-rating  | 2026-01-06 12:37:46,055 - werkzeug - INFO - 192.168.97.1 - - [06/Jan/2026 12:37:46] "GET /api/storage-health HTTP/1.1" 200 -
+auto-vote-rating  | 2026-01-06 12:37:46,056 - werkzeug - INFO - 192.168.97.1 - - [06/Jan/2026 12:37:46] "GET /api/projects/status HTTP/1.1" 200 -
+auto-vote-rating  | 2026-01-06 12:37:51,052 - database - INFO - Loaded 1 projects from /app/data/projects.json
+auto-vote-rating  | 2026-01-06 12:37:51,053 - werkzeug - INFO - 192.168.97.1 - - [06/Jan/2026 12:37:51] "GET /api/projects/status HTTP/1.1" 200 -
+auto-vote-rating  | 2026-01-06 12:37:51,055 - database - INFO - Loaded 1 projects from /app/data/projects.json
+auto-vote-rating  | 2026-01-06 12:37:51,056 - werkzeug - INFO - 192.168.97.1 - - [06/Jan/2026 12:37:51] "GET /api/storage-health HTTP/1.1" 200 -
+auto-vote-rating  | 2026-01-06 12:37:51,067 - werkzeug - INFO - 192.168.97.1 - - [06/Jan/2026 12:37:51] "GET /api/logs?limit=200 HTTP/1.1" 200 -
+auto-vote-rating  | 2026-01-06 12:37:56,061 - werkzeug - INFO - 192.168.97.1 - - [06/Jan/2026 12:37:56] "GET /api/logs?limit=200 HTTP/1.1" 200 -
+auto-vote-rating  | 2026-01-06 12:37:56,067 - database - INFO - Loaded 1 projects from /app/data/projects.json
+auto-vote-rating  | 2026-01-06 12:37:56,069 - werkzeug - INFO - 192.168.97.1 - - [06/Jan/2026 12:37:56] "GET /api/projects/status HTTP/1.1" 200 -
+auto-vote-rating  | 2026-01-06 12:37:56,073 - database - INFO - Loaded 1 projects from /app/data/projects.json
+auto-vote-rating  | 2026-01-06 12:37:56,074 - werkzeug - INFO - 192.168.97.1 - - [06/Jan/2026 12:37:56] "GET /api/storage-health HTTP/1.1" 200 -
+auto-vote-rating  | 2026-01-06 12:37:58,998 - apscheduler.executors.default - INFO - Running job "VoteWorker.check_and_vote (trigger: interval[0:01:00], next run at: 2026-01-06 12:38:58 UTC)" (scheduled at 2026-01-06 12:37:58.994343+00:00)
+auto-vote-rating  | 2026-01-06 12:37:58,999 - database - INFO - Loaded 1 projects from /app/data/projects.json
+auto-vote-rating  | 2026-01-06 12:37:58,999 - database - INFO - Loaded settings from /app/data/settings.json
+auto-vote-rating  | 2026-01-06 12:37:59,002 - database - INFO - Loaded 1 projects from /app/data/projects.json
+auto-vote-rating  | 2026-01-06 12:37:59,005 - database - INFO - Loaded 1 projects from /app/data/projects.json
+auto-vote-rating  | 2026-01-06 12:37:59,006 - database - INFO - Loaded 1 projects from /app/data/projects.json
+auto-vote-rating  | 2026-01-06 12:37:59,007 - __main__ - INFO - [0] Before _process_project: cdpUrl=None, cdpBrowserActive=False
+auto-vote-rating  | 2026-01-06 12:37:59,008 - __main__ - INFO - [0] After _process_project: cdpUrl=None, cdpBrowserActive=False
+auto-vote-rating  | 2026-01-06 12:37:59,010 - __main__ - INFO - [0] About to update_project: cdpUrl=None, cdpBrowserActive=False
+auto-vote-rating  | 2026-01-06 12:37:59,010 - database - INFO - Loaded 1 projects from /app/data/projects.json
+auto-vote-rating  | 2026-01-06 12:37:59,012 - __main__ - INFO - [0] Finished update_project
+auto-vote-rating  | 2026-01-06 12:37:59,012 - apscheduler.executors.default - INFO - Job "VoteWorker.check_and_vote (trigger: interval[0:01:00], next run at: 2026-01-06 12:38:58 UTC)" executed successfully
+auto-vote-rating  | 2026-01-06 12:38:01,055 - werkzeug - INFO - 192.168.97.1 - - [06/Jan/2026 12:38:01] "GET /api/logs?limit=200 HTTP/1.1" 200 -
+auto-vote-rating  | 2026-01-06 12:38:01,056 - database - INFO - Loaded 1 projects from /app/data/projects.json
+auto-vote-rating  | 2026-01-06 12:38:01,060 - werkzeug - INFO - 192.168.97.1 - - [06/Jan/2026 12:38:01] "GET /api/projects/status HTTP/1.1" 200 -
+auto-vote-rating  | 2026-01-06 12:38:01,061 - database - INFO - Loaded 1 projects from /app/data/projects.json
+auto-vote-rating  | 2026-01-06 12:38:01,063 - werkzeug - INFO - 192.168.97.1 - - [06/Jan/2026 12:38:01] "GET /api/storage-health HTTP/1.1" 200 -
+auto-vote-rating  | 2026-01-06 12:38:01,125 - database - INFO - Loaded settings from /app/data/settings.json
+auto-vote-rating  | 2026-01-06 12:38:01,125 - werkzeug - INFO - 127.0.0.1 - - [06/Jan/2026 12:38:01] "GET /health HTTP/1.1" 200 -
+auto-vote-rating  | 2026-01-06 12:38:06,043 - database - INFO - Loaded 1 projects from /app/data/projects.json
+auto-vote-rating  | 2026-01-06 12:38:06,044 - werkzeug - INFO - 192.168.97.1 - - [06/Jan/2026 12:38:06] "GET /api/storage-health HTTP/1.1" 200 -
+auto-vote-rating  | 2026-01-06 12:38:06,046 - werkzeug - INFO - 192.168.97.1 - - [06/Jan/2026 12:38:06] "GET /api/logs?limit=200 HTTP/1.1" 200 -
+auto-vote-rating  | 2026-01-06 12:38:06,046 - database - INFO - Loaded 1 projects from /app/data/projects.json
+auto-vote-rating  | 2026-01-06 12:38:06,047 - werkzeug - INFO - 192.168.97.1 - - [06/Jan/2026 12:38:06] "GET /api/projects/status HTTP/1.1" 200 -
+auto-vote-rating  | 2026-01-06 12:38:11,051 - database - INFO - Loaded 1 projects from /app/data/projects.json
+auto-vote-rating  | 2026-01-06 12:38:11,051 - werkzeug - INFO - 192.168.97.1 - - [06/Jan/2026 12:38:11] "GET /api/storage-health HTTP/1.1" 200 -
+auto-vote-rating  | 2026-01-06 12:38:11,052 - database - INFO - Loaded 1 projects from /app/data/projects.json
+auto-vote-rating  | 2026-01-06 12:38:11,053 - werkzeug - INFO - 192.168.97.1 - - [06/Jan/2026 12:38:11] "GET /api/projects/status HTTP/1.1" 200 -
+auto-vote-rating  | 2026-01-06 12:38:11,053 - werkzeug - INFO - 192.168.97.1 - - [06/Jan/2026 12:38:11] "GET /api/logs?limit=200 HTTP/1.1" 200 -
+auto-vote-rating  | 2026-01-06 12:38:16,051 - database - INFO - Loaded 1 projects from /app/data/projects.json
+auto-vote-rating  | 2026-01-06 12:38:16,052 - werkzeug - INFO - 192.168.97.1 - - [06/Jan/2026 12:38:16] "GET /api/storage-health HTTP/1.1" 200 -
+auto-vote-rating  | 2026-01-06 12:38:16,053 - werkzeug - INFO - 192.168.97.1 - - [06/Jan/2026 12:38:16] "GET /api/logs?limit=200 HTTP/1.1" 200 -
+auto-vote-rating  | 2026-01-06 12:38:16,053 - database - INFO - Loaded 1 projects from /app/data/projects.json
+auto-vote-rating  | 2026-01-06 12:38:16,055 - werkzeug - INFO - 192.168.97.1 - - [06/Jan/2026 12:38:16] "GET /api/projects/status HTTP/1.1" 200 -
+auto-vote-rating  | 2026-01-06 12:38:21,053 - database - INFO - Loaded 1 projects from /app/data/projects.json
+auto-vote-rating  | 2026-01-06 12:38:21,055 - werkzeug - INFO - 192.168.97.1 - - [06/Jan/2026 12:38:21] "GET /api/storage-health HTTP/1.1" 200 -
+auto-vote-rating  | 2026-01-06 12:38:21,057 - werkzeug - INFO - 192.168.97.1 - - [06/Jan/2026 12:38:21] "GET /api/logs?limit=200 HTTP/1.1" 200 -
+auto-vote-rating  | 2026-01-06 12:38:21,058 - database - INFO - Loaded 1 projects from /app/data/projects.json
+auto-vote-rating  | 2026-01-06 12:38:21,058 - werkzeug - INFO - 192.168.97.1 - - [06/Jan/2026 12:38:21] "GET /api/projects/status HTTP/1.1" 200 -
+auto-vote-rating  | 2026-01-06 12:38:26,049 - database - INFO - Loaded 1 projects from /app/data/projects.json
+auto-vote-rating  | 2026-01-06 12:38:26,049 - werkzeug - INFO - 192.168.97.1 - - [06/Jan/2026 12:38:26] "GET /api/storage-health HTTP/1.1" 200 -
+auto-vote-rating  | 2026-01-06 12:38:26,050 - database - INFO - Loaded 1 projects from /app/data/projects.json
+auto-vote-rating  | 2026-01-06 12:38:26,051 - werkzeug - INFO - 192.168.97.1 - - [06/Jan/2026 12:38:26] "GET /api/projects/status HTTP/1.1" 200 -
+auto-vote-rating  | 2026-01-06 12:38:26,059 - werkzeug - INFO - 192.168.97.1 - - [06/Jan/2026 12:38:26] "GET /api/logs?limit=200 HTTP/1.1" 200 -
+auto-vote-rating  | 2026-01-06 12:38:26,971 - database - INFO - Loaded settings from /app/data/settings.json
+auto-vote-rating  | 2026-01-06 12:38:26,971 - werkzeug - INFO - 192.168.97.1 - - [06/Jan/2026 12:38:26] "GET /api/settings HTTP/1.1" 200 -
+auto-vote-rating  | 2026-01-06 12:38:28,567 - werkzeug - INFO - 192.168.97.1 - - [06/Jan/2026 12:38:28] "GET /api/logs/download?source=worker HTTP/1.1" 200 -
+auto-vote-rating  | 2026-01-06 12:38:29,007 - werkzeug - INFO - 192.168.97.1 - - [06/Jan/2026 12:38:29] "GET /api/logs/download?source=debug HTTP/1.1" 200 -
+auto-vote-rating  | 2026-01-06 12:38:31,180 - database - INFO - Loaded settings from /app/data/settings.json
+auto-vote-rating  | 2026-01-06 12:38:31,181 - werkzeug - INFO - 127.0.0.1 - - [06/Jan/2026 12:38:31] "GET /health HTTP/1.1" 200 -
+auto-vote-rating  | 2026-01-06 12:38:58,997 - apscheduler.executors.default - INFO - Running job "VoteWorker.check_and_vote (trigger: interval[0:01:00], next run at: 2026-01-06 12:39:58 UTC)" (scheduled at 2026-01-06 12:38:58.994343+00:00)
+auto-vote-rating  | 2026-01-06 12:38:58,999 - database - INFO - Loaded 1 projects from /app/data/projects.json
+auto-vote-rating  | 2026-01-06 12:38:59,000 - database - INFO - Loaded settings from /app/data/settings.json
+auto-vote-rating  | 2026-01-06 12:38:59,010 - database - INFO - Loaded 1 projects from /app/data/projects.json
+auto-vote-rating  | 2026-01-06 12:38:59,011 - database - INFO - Loaded 1 projects from /app/data/projects.json
+auto-vote-rating  | 2026-01-06 12:38:59,011 - database - INFO - Loaded 1 projects from /app/data/projects.json
+auto-vote-rating  | 2026-01-06 12:38:59,012 - __main__ - INFO - [0] Before _process_project: cdpUrl=None, cdpBrowserActive=False
+auto-vote-rating  | 2026-01-06 12:38:59,012 - __main__ - INFO - [0] After _process_project: cdpUrl=None, cdpBrowserActive=False
+auto-vote-rating  | 2026-01-06 12:38:59,017 - __main__ - INFO - [0] About to update_project: cdpUrl=None, cdpBrowserActive=False
+auto-vote-rating  | 2026-01-06 12:38:59,018 - database - INFO - Loaded 1 projects from /app/data/projects.json
+auto-vote-rating  | 2026-01-06 12:38:59,020 - __main__ - INFO - [0] Finished update_project
+auto-vote-rating  | 2026-01-06 12:38:59,020 - apscheduler.executors.default - INFO - Job "VoteWorker.check_and_vote (trigger: interval[0:01:00], next run at: 2026-01-06 12:39:58 UTC)" executed successfully
+auto-vote-rating  | 2026-01-06 12:39:01,234 - database - INFO - Loaded settings from /app/data/settings.json
+auto-vote-rating  | 2026-01-06 12:39:01,234 - werkzeug - INFO - 127.0.0.1 - - [06/Jan/2026 12:39:01] "GET /health HTTP/1.1" 200 -
+auto-vote-rating  | 2026-01-06 12:39:31,332 - database - INFO - Loaded settings from /app/data/settings.json
+auto-vote-rating  | 2026-01-06 12:39:31,333 - werkzeug - INFO - 127.0.0.1 - - [06/Jan/2026 12:39:31] "GET /health HTTP/1.1" 200 -
+auto-vote-rating  | 2026-01-06 12:39:58,900 - werkzeug - INFO - 192.168.97.1 - - [06/Jan/2026 12:39:58] "GET /api/logs/download?source=debug HTTP/1.1" 200 -
+auto-vote-rating  | 2026-01-06 12:39:59,002 - apscheduler.executors.default - INFO - Running job "VoteWorker.check_and_vote (trigger: interval[0:01:00], next run at: 2026-01-06 12:40:58 UTC)" (scheduled at 2026-01-06 12:39:58.994343+00:00)
+auto-vote-rating  | 2026-01-06 12:39:59,013 - database - INFO - Loaded 1 projects from /app/data/projects.json
+auto-vote-rating  | 2026-01-06 12:39:59,014 - database - INFO - Loaded settings from /app/data/settings.json
+auto-vote-rating  | 2026-01-06 12:39:59,017 - database - INFO - Loaded 1 projects from /app/data/projects.json
+auto-vote-rating  | 2026-01-06 12:39:59,018 - database - INFO - Loaded 1 projects from /app/data/projects.json
+auto-vote-rating  | 2026-01-06 12:39:59,018 - database - INFO - Loaded 1 projects from /app/data/projects.json
+auto-vote-rating  | 2026-01-06 12:39:59,018 - __main__ - INFO - [0] Before _process_project: cdpUrl=None, cdpBrowserActive=False
+auto-vote-rating  | 2026-01-06 12:39:59,018 - __main__ - INFO - [0] After _process_project: cdpUrl=None, cdpBrowserActive=False
+auto-vote-rating  | 2026-01-06 12:39:59,019 - __main__ - INFO - [0] About to update_project: cdpUrl=None, cdpBrowserActive=False
+auto-vote-rating  | 2026-01-06 12:39:59,020 - database - INFO - Loaded 1 projects from /app/data/projects.json
+auto-vote-rating  | 2026-01-06 12:39:59,029 - __main__ - INFO - [0] Finished update_project
+auto-vote-rating  | 2026-01-06 12:39:59,030 - apscheduler.executors.default - INFO - Job "VoteWorker.check_and_vote (trigger: interval[0:01:00], next run at: 2026-01-06 12:40:58 UTC)" executed successfully
+auto-vote-rating  | 2026-01-06 12:40:01,411 - database - INFO - Loaded settings from /app/data/settings.json
+auto-vote-rating  | 2026-01-06 12:40:01,411 - werkzeug - INFO - 127.0.0.1 - - [06/Jan/2026 12:40:01] "GET /health HTTP/1.1" 200 -
+auto-vote-rating  | 2026-01-06 12:40:31,457 - database - INFO - Loaded settings from /app/data/settings.json
+auto-vote-rating  | 2026-01-06 12:40:31,458 - werkzeug - INFO - 127.0.0.1 - - [06/Jan/2026 12:40:31] "GET /health HTTP/1.1" 200 -

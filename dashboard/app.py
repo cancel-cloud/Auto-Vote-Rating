@@ -337,6 +337,104 @@ def list_logs():
         return jsonify({'success': False, 'error': str(e)}), 500
 
 
+# =================================================================
+# Manual Browser Control API (for captcha solving)
+# =================================================================
+
+@app.route('/api/projects/<key>/request-manual-browser', methods=['POST'])
+def request_manual_browser(key):
+    """
+    Request worker to launch headful browser with CDP.
+    Worker will pick this up on next tick (within 60 seconds).
+    """
+    try:
+        project = db.get_project(key)
+        if not project:
+            return jsonify({'success': False, 'error': 'Project not found'}), 404
+
+        runtime = project.get('runtime', {})
+        if runtime.get('status') != 'NEEDS_USER_ACTION':
+            return jsonify({
+                'success': False,
+                'error': 'Project not in NEEDS_USER_ACTION state'
+            }), 400
+
+        # Set flag for worker to pick up
+        runtime['manualBrowserRequested'] = True
+        db.update_project(project)
+
+        logger.info(f"Manual browser requested for {key}")
+        return jsonify({
+            'success': True,
+            'message': 'Browser launch requested - will start within 60 seconds',
+            'project': project
+        })
+    except Exception as e:
+        logger.error(f"Error requesting manual browser: {e}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+@app.route('/api/projects/<key>/complete-manual-solve', methods=['POST'])
+def complete_manual_solve(key):
+    """
+    Mark captcha as solved and resume automation.
+    Closes headful browser and schedules next vote.
+    """
+    try:
+        project = db.get_project(key)
+        if not project:
+            return jsonify({'success': False, 'error': 'Project not found'}), 404
+
+        runtime = project.get('runtime', {})
+
+        # Set flag for worker to pick up and process
+        runtime['manualSolveCompleted'] = True
+        db.update_project(project)
+
+        logger.info(f"Manual solve completed for {key}")
+        return jsonify({
+            'success': True,
+            'message': 'Resume requested - worker will process within 60 seconds',
+            'project': project
+        })
+
+    except Exception as e:
+        logger.error(f"Error completing manual solve: {e}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+@app.route('/api/projects/<key>/cdp-info', methods=['GET'])
+def get_cdp_info(key):
+    """Get CDP connection info for manual browser."""
+    try:
+        project = db.get_project(key)
+        if not project:
+            return jsonify({'success': False, 'error': 'Project not found'}), 404
+
+        runtime = project.get('runtime', {})
+        cdp_url = runtime.get('cdpUrl')
+
+        if not cdp_url:
+            return jsonify({
+                'success': False,
+                'error': 'Manual browser not active'
+            }), 400
+
+        return jsonify({
+            'success': True,
+            'cdpUrl': cdp_url,
+            'authToken': config.cdp_auth_token,
+            'instructions': f'Access browser at: {cdp_url}?token={config.cdp_auth_token}'
+        })
+    except Exception as e:
+        logger.error(f"Error getting CDP info: {e}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+# =================================================================
+# Static file serving
+# =================================================================
+
 # Serve static files (CSS, JS, images)
 @app.route('/css/<path:filename>')
 def serve_css(filename):

@@ -110,9 +110,23 @@ class VoteWorker:
             self.db.mark_worker_tick()
             self.db.append_log({"event": "tick.start", "projectCount": len(projects)})
 
+            # Check for manual intervention requests from dashboard
+            self._check_manual_browser_requests()
+            self._check_manual_solve_completions()
+
+            # Reload projects after manual browser/solve checks to get updated state
+            projects = self.db.get_all_projects()
+
             for project in projects:
                 try:
+                    project_key = project.get("key")
+                    runtime = project.get("runtime", {})
+                    logger.info(f"[{project_key}] Before _process_project: cdpUrl={runtime.get('cdpUrl')}, cdpBrowserActive={runtime.get('cdpBrowserActive')}")
+
                     action = self._process_project(project, settings, now_utc, now_local)
+
+                    logger.info(f"[{project_key}] After _process_project: cdpUrl={runtime.get('cdpUrl')}, cdpBrowserActive={runtime.get('cdpBrowserActive')}")
+
                     self.db.append_log(
                         {
                             "event": "project.tick",
@@ -123,7 +137,10 @@ class VoteWorker:
                             "action": action,
                         }
                     )
+
+                    logger.info(f"[{project_key}] About to update_project: cdpUrl={runtime.get('cdpUrl')}, cdpBrowserActive={runtime.get('cdpBrowserActive')}")
                     self.db.update_project(project)
+                    logger.info(f"[{project_key}] Finished update_project")
                 except Exception as exc:
                     logger.error("Error processing project %s: %s", project.get("key"), exc, exc_info=True)
                     self.db.append_log(
@@ -150,6 +167,11 @@ class VoteWorker:
 
         self._reset_daily_counters(runtime, settings, now_local)
         self._settle_needs_action(project, runtime, now_utc)
+
+        # Skip processing if manual browser is active
+        if runtime.get("cdpBrowserActive"):
+            logger.debug(f"[{project['key']}] Manual browser active - skipping automated voting")
+            return "manual_browser_active"
 
         next_attempt = _dt_from_iso(runtime.get("nextAttemptAt"))
         status = runtime.get("status")
@@ -299,6 +321,12 @@ class VoteWorker:
         now_local: datetime,
         reason: str,
     ):
+        # Skip vote if manual browser is active
+        if runtime.get("cdpBrowserActive"):
+            logger.info(f"[{project['key']}] Skipping automated vote - manual browser is active")
+            runtime["lastAction"] = "Waiting for manual captcha solve"
+            return
+
         runtime["status"] = ProjectStatus.IN_PROGRESS.value
         runtime["queuedAt"] = None
         runtime["startedAt"] = _iso_from_dt(now_utc)
@@ -326,7 +354,81 @@ class VoteWorker:
     ):
         runtime["finishedAt"] = _iso_from_dt(now_utc)
         policy = settings.get("retryPolicy", {})
-        if result.get("success"):
+
+        # NEW: Handle captcha detection - requires manual intervention
+        if result.get("needs_captcha"):
+            captcha_type = result.get("captcha_type", "unknown")
+            message = result.get("message") or f"Captcha detected: {captcha_type}"
+
+            runtime["status"] = ProjectStatus.NEEDS_USER_ACTION.value
+            runtime["captchaType"] = captcha_type
+            runtime["lastAction"] = message
+            runtime["lastResult"] = {
+                "ok": False,
+                "reason": "captcha_detected",
+                "captchaType": captcha_type,
+                "message": message,
+            }
+            runtime["needsActionUntil"] = _iso_from_dt(
+                now_utc + timedelta(seconds=self.config.captcha_timeout_seconds)
+            )
+            runtime["manualBrowserRequested"] = False  # Flag for dashboard to set
+            runtime["cdpBrowserActive"] = False
+            runtime["cdpUrl"] = None
+
+            self.db.append_project_event(project, "CAPTCHA_DETECTED",
+                f"Manual intervention required: {captcha_type}")
+            self.db.append_log({
+                "event": "project.captcha",
+                "projectKey": project["key"],
+                "captchaType": captcha_type,
+                "message": message,
+            })
+
+            logger.warning(f"Project {project['key']} needs user action for captcha: {captcha_type}")
+            # Don't schedule next attempt yet - wait for manual solve
+            return
+
+        # NEW: Handle automated vote success
+        if result.get("success") and result.get("automated"):
+            message = result.get("message") or "Vote completed automatically"
+            runtime["status"] = ProjectStatus.SUCCESS.value
+            runtime["lastAction"] = message
+            runtime["lastResult"] = {
+                "ok": True,
+                "reason": None,
+                "automated": True,
+                "message": message,
+            }
+            runtime["lastSuccessAt"] = _iso_from_dt(now_utc)
+            runtime["retriesRemaining"] = policy.get("maxRetriesPerDay", 3)
+
+            project["stats"]["successVotes"] = project["stats"].get("successVotes", 0) + 1
+            project["stats"]["monthSuccessVotes"] = project["stats"].get("monthSuccessVotes", 0) + 1
+            project["stats"]["lastSuccessVote"] = _ms_from_dt(now_utc)
+
+            self.db.append_project_event(project, "SUCCESS", message)
+            self.db.append_log({
+                "event": "project.result",
+                "projectKey": project["key"],
+                "result": "automated_success",
+                "message": message,
+            })
+
+            # Schedule next vote for tomorrow
+            future = self._pick_window_time(
+                now_local + timedelta(days=1),
+                settings.get("dailyWindowStart", "09:00"),
+                settings.get("dailyWindowEnd", "21:00"),
+                int(settings.get("jitterMinutes", 20)),
+                allow_today=False,
+            )
+            runtime["nextAttemptAt"] = _iso_from_dt(future.astimezone(timezone.utc))
+            project["time"] = _ms_from_dt(future)
+            self._update_schedule_status(runtime, future.astimezone(timezone.utc), now_utc)
+
+        # Handle reminder mode success (page opened but not automated)
+        elif result.get("success"):
             message = result.get("message") or "Vote page opened - complete manually"
             runtime["status"] = ProjectStatus.NEEDS_USER_ACTION.value
             runtime["lastAction"] = message
@@ -339,18 +441,19 @@ class VoteWorker:
             runtime["lastSuccessAt"] = _iso_from_dt(now_utc)
             runtime["needsActionUntil"] = _iso_from_dt(now_utc + timedelta(minutes=NEEDS_ACTION_WINDOW_MINUTES))
             runtime["retriesRemaining"] = policy.get("maxRetriesPerDay", 3)
+
             project["stats"]["successVotes"] = project["stats"].get("successVotes", 0) + 1
             project["stats"]["monthSuccessVotes"] = project["stats"].get("monthSuccessVotes", 0) + 1
             project["stats"]["lastSuccessVote"] = _ms_from_dt(now_utc)
+
             self.db.append_project_event(project, "NEEDS_USER_ACTION", message)
-            self.db.append_log(
-                {
-                    "event": "project.result",
-                    "projectKey": project["key"],
-                    "result": "success",
-                    "message": message,
-                }
-            )
+            self.db.append_log({
+                "event": "project.result",
+                "projectKey": project["key"],
+                "result": "success",
+                "message": message,
+            })
+
             future = self._pick_window_time(
                 now_local + timedelta(days=1),
                 settings.get("dailyWindowStart", "09:00"),
@@ -360,6 +463,8 @@ class VoteWorker:
             )
             runtime["nextAttemptAt"] = _iso_from_dt(future.astimezone(timezone.utc))
             project["time"] = _ms_from_dt(future)
+
+        # Handle failure
         else:
             reason = result.get("error") or "Unknown error"
             runtime["status"] = ProjectStatus.FAILED.value
@@ -370,16 +475,17 @@ class VoteWorker:
                 "httpStatus": result.get("httpStatus"),
                 "message": reason,
             }
+
             project["stats"]["errorVotes"] = project["stats"].get("errorVotes", 0) + 1
+
             self.db.append_project_event(project, "FAILED", reason)
-            self.db.append_log(
-                {
-                    "event": "project.result",
-                    "projectKey": project["key"],
-                    "result": "failure",
-                    "message": reason,
-                }
-            )
+            self.db.append_log({
+                "event": "project.result",
+                "projectKey": project["key"],
+                "result": "failure",
+                "message": reason,
+            })
+
             retry_dt = self._schedule_retry(project, runtime, settings, now_local)
             if retry_dt:
                 runtime["nextAttemptAt"] = _iso_from_dt(retry_dt.astimezone(timezone.utc))
@@ -396,6 +502,134 @@ class VoteWorker:
                 runtime["nextAttemptAt"] = _iso_from_dt(future.astimezone(timezone.utc))
                 project["time"] = _ms_from_dt(future)
                 self._update_schedule_status(runtime, future.astimezone(timezone.utc), now_utc)
+
+    # ------------------------------------------------------------------
+    # Manual intervention helpers
+    # ------------------------------------------------------------------
+    def _check_manual_browser_requests(self):
+        """
+        Check for projects requesting manual browser launch.
+        Dashboard sets manualBrowserRequested=True, worker picks it up here.
+        """
+        projects = self.db.get_all_projects()
+
+        for project in projects:
+            runtime = project.get("runtime", {})
+
+            # Check if dashboard requested manual browser launch
+            if runtime.get("manualBrowserRequested"):
+                project_key = project.get("key")
+                logger.info(f"[{project_key}] Launching manual browser per dashboard request")
+
+                try:
+                    # Launch headful browser with CDP
+                    browser, cdp_url = self.voter.browser_manager.launch_headful_with_cdp(
+                        project_key
+                    )
+
+                    logger.info(f"[{project_key}] Browser launch returned, CDP URL: {cdp_url}")
+
+                    # Update runtime state
+                    runtime["cdpUrl"] = cdp_url
+                    runtime["cdpBrowserActive"] = True
+                    runtime["manualBrowserRequested"] = False
+                    runtime["lastAction"] = "Manual browser launched - solve captcha to continue"
+
+                    # Ensure status reflects manual intervention needed
+                    if runtime.get("status") != ProjectStatus.NEEDS_USER_ACTION.value:
+                        runtime["status"] = ProjectStatus.NEEDS_USER_ACTION.value
+
+                    self.db.update_project(project)
+                    self.db.append_project_event(project, "MANUAL_BROWSER_LAUNCHED",
+                        f"CDP URL: {cdp_url}")
+
+                    logger.info(f"[{project_key}] Manual browser state: cdpUrl={runtime['cdpUrl']}, active={runtime['cdpBrowserActive']}")
+
+                except Exception as e:
+                    logger.error(f"[{project_key}] Failed to launch manual browser: {e}", exc_info=True)
+                    runtime["manualBrowserRequested"] = False
+                    runtime["lastAction"] = f"Error launching browser: {str(e)}"
+                    self.db.update_project(project)
+
+    def _check_manual_solve_completions(self):
+        """
+        Check for projects where user completed manual captcha solve.
+        Dashboard sets manualSolveCompleted=True, worker picks it up here.
+        """
+        projects = self.db.get_all_projects()
+
+        for project in projects:
+            runtime = project.get("runtime", {})
+
+            if runtime.get("manualSolveCompleted"):
+                project_key = project.get("key")
+                logger.info(f"[{project_key}] Processing manual solve completion")
+
+                try:
+                    self.resume_after_manual_solve(project_key)
+                except Exception as e:
+                    logger.error(f"[{project_key}] Error resuming after manual solve: {e}")
+                    # Clear flag even on error to prevent infinite loop
+                    runtime["manualSolveCompleted"] = False
+                    self.db.update_project(project)
+
+    def resume_after_manual_solve(self, project_key: str):
+        """
+        Called after user manually solves captcha.
+        Closes headful browser and schedules next vote.
+        """
+        project = self.db.get_project(project_key)
+        if not project:
+            logger.warning(f"[{project_key}] Project not found")
+            return
+
+        runtime = project.get("runtime", {})
+        settings = self.db.get_settings()
+        now_utc = datetime.now(timezone.utc)
+        now_local = now_utc.astimezone(self.tz)
+
+        logger.info(f"[{project_key}] Resuming after manual captcha solve")
+
+        # Close the headful browser
+        try:
+            self.voter.browser_manager.close_manual_browser(project_key)
+            logger.info(f"[{project_key}] Manual browser closed")
+        except Exception as e:
+            logger.warning(f"[{project_key}] Error closing manual browser: {e}")
+
+        # Mark as success
+        runtime["status"] = ProjectStatus.SUCCESS.value
+        runtime["lastAction"] = "Captcha solved manually"
+        runtime["lastSuccessAt"] = _iso_from_dt(now_utc)
+        runtime["cdpUrl"] = None
+        runtime["cdpBrowserActive"] = False
+        runtime["captchaType"] = None
+        runtime["needsActionUntil"] = None
+        runtime["manualSolveCompleted"] = False
+
+        # Update stats
+        stats = project.get("stats", {})
+        stats["successVotes"] = stats.get("successVotes", 0) + 1
+        stats["monthSuccessVotes"] = stats.get("monthSuccessVotes", 0) + 1
+        stats["lastSuccessVote"] = _ms_from_dt(now_utc)
+
+        # Schedule next vote for tomorrow
+        future = self._pick_window_time(
+            now_local + timedelta(days=1),
+            settings.get("dailyWindowStart", "09:00"),
+            settings.get("dailyWindowEnd", "21:00"),
+            int(settings.get("jitterMinutes", 20)),
+            allow_today=False,
+        )
+        runtime["nextAttemptAt"] = _iso_from_dt(future.astimezone(timezone.utc))
+        project["time"] = _ms_from_dt(future)
+        self._update_schedule_status(runtime, future.astimezone(timezone.utc), now_utc)
+
+        self.db.update_project(project)
+        self.db.append_project_event(project, "MANUAL_SOLVE_COMPLETED",
+            "User solved captcha successfully")
+
+        logger.info(f"[{project_key}] Manual solve completed, next vote scheduled for {future}")
 
 
 def main():
